@@ -18,6 +18,7 @@
     "typescript": "^5.5.3"
   },
   "devDependencies": {
+    "dotenv-webpack": "^8.1.0",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"
   }
