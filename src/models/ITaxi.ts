@@ -1,4 +1,4 @@
-export interface Taxi {
+export interface ITaxi {
   plate: string;
   available: boolean;
 }

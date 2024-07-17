@@ -12,8 +12,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "date-fns": "^3.6.0",
     "json-server": "^1.0.0-beta.1",
     "rxjs": "^7.8.1",
+    "traveltime-api": "^5.8.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.5.3"
   },

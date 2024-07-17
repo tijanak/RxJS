@@ -21,5 +21,7 @@ module.exports = {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
   },
-  plugins: [new Dotenv({ systemvars: true })],
+  plugins: [
+    new Dotenv({ path: path.resolve(__dirname, "./env/environment.env") }),
+  ],
 };
