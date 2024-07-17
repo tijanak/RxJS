@@ -11,6 +11,18 @@ import { IGeocode } from "../models/IGeocode";
 import { GeocodingResponse, TravelTimeClient } from "traveltime-api";
 import { ILocation } from "../models/ILocation";
 
+export function makeRequestObs(inputs: HTMLInputElement[]) {
+  const originObs = locationInputObs(inputs[0]);
+  originObs.subscribe((location: ILocation) => {
+    console.log(location);
+  });
+
+  const destObs = locationInputObs(inputs[1]);
+  destObs.subscribe((location: ILocation) => {
+    console.log(location);
+  });
+}
+
 const travelTimeClient = new TravelTimeClient(
   {
     applicationId: process.env.APP_ID,
@@ -18,19 +30,44 @@ const travelTimeClient = new TravelTimeClient(
   },
   { rateLimitSettings: { enabled: true } }
 );
-export function requestInputObs(input: HTMLInputElement) {
+
+interface LocationSearchInfo {
+  address: string;
+  geocode: GeocodingResponse;
+}
+export function locationInputObs(
+  input: HTMLInputElement
+): Observable<ILocation> {
   return fromEvent(input, "input").pipe(
-    debounceTime(500),
+    debounceTime(1000),
     map((ev: InputEvent) => (<HTMLInputElement>ev.target).value),
     filter((location: string) => location.length >= 3),
-    switchMap((location: string) => getLocationCoords(location))
+    switchMap((location: string) =>
+      getLocationCoords(location).pipe(
+        map((geocodeResp: GeocodingResponse) => {
+          return {
+            address: location,
+            geocode: geocodeResp,
+          };
+        })
+      )
+    ),
+    map((searchInfo: LocationSearchInfo): ILocation => {
+      let geocodeResp = searchInfo.geocode;
+      console.log(geocodeResp);
+      return {
+        address: searchInfo.address,
+        latitude: geocodeResp.features[0].geometry.coordinates[1],
+        longitude: geocodeResp.features[0].geometry.coordinates[0],
+      };
+    })
   );
 }
 
 function getLocationCoords(location: string): Observable<GeocodingResponse> {
   return from(
     fetch(
-      `https://api.traveltimeapp.com/v4/geocoding/search?query=Nis&limit=1&app_id=${process.env.APP_ID}&api_key=${process.env.API_KEY}`,
+      `https://api.traveltimeapp.com/v4/geocoding/search?query=${location}&limit=1&format.exclude.country=true&format.name=true&bounds=43%2C22.5%2C43.5%2C21.5&app_id=${process.env.APP_ID}&api_key=${process.env.API_KEY}`,
       {
         method: "GET",
         headers: {
@@ -63,4 +100,4 @@ function getTaxis() {
     })
     .catch((e) => console.error(e));
 }
-getTaxis();
+//getTaxis();

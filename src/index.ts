@@ -1,12 +1,14 @@
 import { Observable } from "rxjs";
 import { differenceInMinutes } from "date-fns";
 import { TravelTimeClient } from "traveltime-api";
-import { createElements, drawNewRequestForm } from "./views/drawing";
+import { createElements, drawNewRequestForm } from "./views/requestFormUI";
+import { makeRequestObs } from "./controllers/observables";
 
-let inputs: HTMLInputElement[] = [];
-
-createElements(inputs);
-drawNewRequestForm(document.body, inputs);
+let locationInputs: HTMLInputElement[] = [];
+let nameInput: HTMLInputElement = document.createElement("input");
+createElements(locationInputs);
+drawNewRequestForm(document.body, locationInputs, nameInput);
+makeRequestObs(locationInputs);
 /*travelTimeClient
   .geocoding("Mike Alasa 9", {
     acceptLanguage: "en-US",

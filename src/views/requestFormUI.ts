@@ -1,6 +1,4 @@
-import { ITaxi } from "../models/ITaxi";
-
-const requestFormLabels = ["Ime:", "Polazna lokacija:", "Destinacija:"];
+const requestFormLabels: string[] = ["Polazna lokacija:", "Destinacija:"];
 export function createElements(inputs: HTMLInputElement[]) {
   for (let i = 0; i < requestFormLabels.length; i++) {
     inputs[i] = document.createElement("input");
@@ -9,7 +7,8 @@ export function createElements(inputs: HTMLInputElement[]) {
 
 export function drawNewRequestForm(
   container: HTMLElement,
-  inputs: HTMLInputElement[]
+  locationInputs: HTMLInputElement[],
+  nameInput: HTMLInputElement
 ) {
   const formTitleParagraph = document.createElement("p");
   formTitleParagraph.innerText = "Novi zahtev";
@@ -27,11 +26,15 @@ export function drawNewRequestForm(
   const labelsContainer: HTMLDivElement = document.createElement("div");
   labelsContainer.classList.add("requestFormLabels");
 
-  inputs.forEach((input, index) => {
-    const label: HTMLLabelElement = document.createElement("label");
-    label.innerText = requestFormLabels[index];
-    labelsContainer.appendChild(label);
-    inputsContainer.appendChild(input);
+  drawInput(labelsContainer, inputsContainer, nameInput, "Ime");
+
+  locationInputs.forEach((input, index) => {
+    drawInput(
+      labelsContainer,
+      inputsContainer,
+      input,
+      requestFormLabels[index]
+    );
   });
 
   inputsWrapper.appendChild(labelsContainer);
@@ -39,4 +42,15 @@ export function drawNewRequestForm(
   formContainer.appendChild(inputsWrapper);
   container.appendChild(formContainer);
 }
-export function drawTaxi(container: HTMLDivElement, taxi: ITaxi) {}
+
+function drawInput(
+  labelsContainer: HTMLDivElement,
+  inputsContainer: HTMLDivElement,
+  input: HTMLInputElement,
+  labelText: string
+) {
+  const label: HTMLLabelElement = document.createElement("label");
+  label.innerText = labelText;
+  labelsContainer.appendChild(label);
+  inputsContainer.appendChild(input);
+}
