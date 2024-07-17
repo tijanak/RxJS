@@ -1,0 +1,25 @@
+.requestForm {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid black;
+  padding: 5px;
+  width: max-content;
+}
+.requestFormInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.requestFormLabels {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.requestFormInputWrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+.formTitle {
+  align-self: center;
+}

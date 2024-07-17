@@ -1,5 +1,11 @@
+export enum RideStatus {
+  Pending,
+  OnRoute,
+  Completed,
+}
 export interface ITaxiRide {
   duration: number;
-  completed: boolean;
+  status: RideStatus;
   taxi: string;
+  destination: string;
 }

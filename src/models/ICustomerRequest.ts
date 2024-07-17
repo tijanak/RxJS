@@ -1,5 +1,5 @@
 export interface ICustomerRequest {
-  name: string;
+  customerName: string;
+  origin: string;
   destination: string;
-  duration: number;
 }

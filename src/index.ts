@@ -1,27 +1,12 @@
 import { Observable } from "rxjs";
 import { differenceInMinutes } from "date-fns";
 import { TravelTimeClient } from "traveltime-api";
-console.log(`${process.env.GEOCODE_KEY}taxis`);
-function getTaxis() {
-  fetch(`${process.env.SERVER}taxis`)
-    .then((response) => {
-      if (response.ok) return response.json();
-    })
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((e) => console.error(e));
-}
-getTaxis();
+import { createElements, drawNewRequestForm } from "./views/drawing";
 
-const travelTimeClient = new TravelTimeClient(
-  {
-    applicationId: "d94dd299",
-    apiKey: "41ceea9b928ed1d576beb30b65b28c31",
-  },
-  { rateLimitSettings: { enabled: true } }
-);
+let inputs: HTMLInputElement[] = [];
 
+createElements(inputs);
+drawNewRequestForm(document.body, inputs);
 /*travelTimeClient
   .geocoding("Mike Alasa 9", {
     acceptLanguage: "en-US",
