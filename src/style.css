@@ -4,6 +4,7 @@
   border: 2px solid black;
   padding: 5px;
   width: max-content;
+  gap: 5px;
 }
 .requestFormInputs {
   display: flex;

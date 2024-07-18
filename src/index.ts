@@ -3,12 +3,21 @@ import { differenceInMinutes } from "date-fns";
 import { TravelTimeClient } from "traveltime-api";
 import { createElements, drawNewRequestForm } from "./views/requestFormUI";
 import { makeRequestObs } from "./controllers/observables";
+import { getDistanceInKm } from "./models/ILocation";
 
 let locationInputs: HTMLInputElement[] = [];
 let nameInput: HTMLInputElement = document.createElement("input");
+let formBtn: HTMLButtonElement = document.createElement("button");
 createElements(locationInputs);
-drawNewRequestForm(document.body, locationInputs, nameInput);
-makeRequestObs(locationInputs);
+drawNewRequestForm(document.body, locationInputs, nameInput, formBtn);
+makeRequestObs(locationInputs, nameInput, formBtn);
+
+/*console.log(
+  getDistanceInKm(
+    { latitude: 43.315171374964976, longitude: 21.91652238674348 },
+    { latitude: 43.324268120690455, longitude: 21.90883842550084 }
+  )
+);*/
 /*travelTimeClient
   .geocoding("Mike Alasa 9", {
     acceptLanguage: "en-US",

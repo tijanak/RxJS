@@ -8,7 +8,8 @@ export function createElements(inputs: HTMLInputElement[]) {
 export function drawNewRequestForm(
   container: HTMLElement,
   locationInputs: HTMLInputElement[],
-  nameInput: HTMLInputElement
+  nameInput: HTMLInputElement,
+  formBtn: HTMLButtonElement
 ) {
   const formTitleParagraph = document.createElement("p");
   formTitleParagraph.innerText = "Novi zahtev";
@@ -40,6 +41,10 @@ export function drawNewRequestForm(
   inputsWrapper.appendChild(labelsContainer);
   inputsWrapper.appendChild(inputsContainer);
   formContainer.appendChild(inputsWrapper);
+
+  formBtn.textContent = "Dodaj zahtev";
+  formContainer.appendChild(formBtn);
+
   container.appendChild(formContainer);
 }
 
