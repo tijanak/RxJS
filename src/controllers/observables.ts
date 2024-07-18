@@ -15,6 +15,7 @@ import { IGeocode } from "../models/IGeocode";
 import { GeocodingResponse, TravelTimeClient } from "traveltime-api";
 import { ILocation } from "../models/ILocation";
 import { ICustomerRequest } from "../models/ICustomerRequest";
+import { ITaxi } from "../models/ITaxi";
 
 export function makeRequestObs(
   inputs: HTMLInputElement[],
@@ -51,9 +52,6 @@ export function makeRequestObs(
       );
     })
   );
-  btnClick.subscribe((e) => {
-    console.log(e);
-  });
   return btnClick;
 }
 
@@ -76,7 +74,7 @@ function nameObs(input: HTMLInputElement): Observable<string> {
     filter((name: string) => name.length > 2)
   );
 }
-function btnObs(btn: HTMLButtonElement) {
+function btnObs(btn: HTMLButtonElement): Observable<Event> {
   return fromEvent(btn, "click");
 }
 function locationInputObs(input: HTMLInputElement): Observable<ILocation> {
@@ -110,6 +108,7 @@ function getLocationCoords(location: string): Observable<ILocation> {
       })
       .catch((e) => {
         console.error(e);
+        alert(e);
       })
   ).pipe(
     map((geocodeResp: GeocodingResponse): ILocation => {
@@ -123,14 +122,12 @@ function getLocationCoords(location: string): Observable<ILocation> {
     })
   );
 }
-
-function getTaxis() {
-  fetch(`${process.env.SERVER}taxis`)
-    .then((response) => {
-      if (response.ok) return response.json();
-    })
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((e) => console.error(e));
+export function taxiObs(): Observable<ITaxi[]> {
+  return from(
+    fetch(`${process.env.SERVER}taxis`)
+      .then((response) => {
+        if (response.ok) return response.json();
+      })
+      .catch((e) => console.error(e))
+  );
 }

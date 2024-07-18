@@ -1,9 +1,9 @@
 {
   "taxis": [
     {
-      "id": 0,
       "plate": "NIdkflsjdlf",
-      "available": true
+      "available": true,
+      "location": { "latitude": "43.331561", "longitude": "21.931582" }
     }
   ],
   "locations": [

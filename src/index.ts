@@ -2,16 +2,32 @@ import { Observable } from "rxjs";
 import { differenceInMinutes } from "date-fns";
 import { TravelTimeClient } from "traveltime-api";
 import { createElements, drawNewRequestForm } from "./views/requestFormUI";
-import { makeRequestObs } from "./controllers/observables";
+import { makeRequestObs, taxiObs } from "./controllers/observables";
 import { getDistanceInKm } from "./models/ILocation";
+import { DispatchService } from "./models/DispatchService";
+import { drawTaxi, drawTaxis } from "./views/taxiUI";
 
 let locationInputs: HTMLInputElement[] = [];
+let errorTextDivs: HTMLSpanElement[] = [];
 let nameInput: HTMLInputElement = document.createElement("input");
 let formBtn: HTMLButtonElement = document.createElement("button");
-createElements(locationInputs);
-drawNewRequestForm(document.body, locationInputs, nameInput, formBtn);
-makeRequestObs(locationInputs, nameInput, formBtn);
-
+createElements(locationInputs, errorTextDivs);
+drawNewRequestForm(
+  document.body,
+  locationInputs,
+  errorTextDivs,
+  nameInput,
+  formBtn
+);
+let taxi$ = taxiObs();
+let taxiService: DispatchService = new DispatchService(
+  taxi$,
+  makeRequestObs(locationInputs, nameInput, formBtn)
+);
+taxi$.subscribe((taxi) => {
+  console.log(taxi);
+  drawTaxis(taxi);
+});
 /*console.log(
   getDistanceInKm(
     { latitude: 43.315171374964976, longitude: 21.91652238674348 },

@@ -1,13 +1,18 @@
 const requestFormLabels: string[] = ["Polazna lokacija:", "Destinacija:"];
-export function createElements(inputs: HTMLInputElement[]) {
+export function createElements(
+  inputs: HTMLInputElement[],
+  errorTextDivs: HTMLSpanElement[]
+) {
   for (let i = 0; i < requestFormLabels.length; i++) {
     inputs[i] = document.createElement("input");
+    errorTextDivs[i] = document.createElement("SPAN");
   }
 }
 
 export function drawNewRequestForm(
   container: HTMLElement,
   locationInputs: HTMLInputElement[],
+  errorTextDivs: HTMLSpanElement[],
   nameInput: HTMLInputElement,
   formBtn: HTMLButtonElement
 ) {
