@@ -12,9 +12,7 @@ export interface ITaxiRide {
   duration: number;
   status: RideStatus;
   taxi: string;
-  destination: ILocation;
-  origin: ILocation;
-  customerName: string;
+  request: ICustomerRequest;
 }
 
 export class TaxiRide implements ITaxiRide {
@@ -22,14 +20,10 @@ export class TaxiRide implements ITaxiRide {
   duration: number;
   status: RideStatus;
   taxi: string;
-  destination: ILocation;
-  origin: ILocation;
-  customerName: string;
+  request: ICustomerRequest;
   constructor(taxiId: number, taxi: ITaxi, request: ICustomerRequest) {
     (this.id = taxiId), (this.status = RideStatus.Pending);
     this.taxi = taxi.plate;
-    this.destination = request.destination;
-    this.origin = request.origin;
-    this.customerName = request.customerName;
+    this.request = request;
   }
 }

@@ -34,17 +34,21 @@ garage.taxi$.subscribe((taxi) => {
 taxiService.ride$.subscribe((rides) => {
   console.log(rides);
 });
-var b = false,
-  b2 = false;
+let help = document.createElement("div");
+document.body.appendChild(help);
+taxiService.unprocessedRequest$.subscribe((requests) => {
+  help.innerHTML = "";
+  requests.forEach((r) => {
+    help.innerHTML += r.customerName;
+  });
+});
 var btn1 = document.createElement("button");
 btn1.addEventListener("click", () => {
-  garage.changeAvailability("NIdkflsjdlf", b);
-  b = !b;
+  garage.changeAvailability("NIdkflsjdlf", true);
 });
 var btn2 = document.createElement("button");
 btn2.addEventListener("click", () => {
-  garage.changeAvailability("NSssdfdf", b2);
-  b2 = !b2;
+  garage.changeAvailability("NSssdfdf", true);
 });
 btn1.textContent = "bt1";
 btn2.textContent = "bt2";

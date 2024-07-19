@@ -8,6 +8,7 @@ import {
   map,
   Observable,
   repeat,
+  ReplaySubject,
   switchMap,
   takeLast,
   withLatestFrom,
@@ -23,10 +24,12 @@ export function makeRequestObs(
   nameInput: HTMLInputElement,
   formBtn: HTMLButtonElement
 ): Observable<ICustomerRequest> {
+  const subject = new ReplaySubject<ICustomerRequest>();
   const originObs = locationInputObs(inputs[0]);
   originObs.subscribe((location: ILocation) => {
     console.log("origin");
   });
+
   const destObs = locationInputObs(inputs[1]);
   destObs.subscribe((location: ILocation) => {
     console.log("dest");
@@ -37,23 +40,32 @@ export function makeRequestObs(
   });
   const test = combineLatest([originObs, destObs, name]);
   test.subscribe((e) => console.log(e));
-  const btnClick = btnObs(formBtn).pipe(
-    withLatestFrom(test),
-    map((v): ICustomerRequest => {
-      return { customerName: v[1][2], destination: v[1][1], origin: v[1][0] };
-    }),
-    filter((value) => {
-      return (
-        value.customerName != null &&
-        value.customerName != undefined &&
-        value.destination != undefined &&
-        value.destination != null &&
-        value.origin != null &&
-        value.origin != undefined
-      );
-    })
-  );
-  return btnClick;
+  const btnClick = btnObs(formBtn)
+    .pipe(
+      withLatestFrom(test),
+      map((v): ICustomerRequest => {
+        return {
+          id: "",
+          customerName: v[1][2],
+          destination: v[1][1],
+          origin: v[1][0],
+        };
+      }),
+      filter((value) => {
+        return (
+          value.customerName != null &&
+          value.customerName != undefined &&
+          value.destination != undefined &&
+          value.destination != null &&
+          value.origin != null &&
+          value.origin != undefined
+        );
+      })
+    )
+    .subscribe((e) => {
+      subject.next(e);
+    });
+  return subject.asObservable();
 }
 
 /*const travelTimeClient = new TravelTimeClient(
@@ -139,5 +151,12 @@ export function createAvailableTaxiObs(taxi$: Observable<ITaxi[]>) {
   return taxi$.pipe(
     map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),
     filter((taxis) => taxis.length != 0)
+  );
+}
+
+export function createEmptyGarageObs(taxi$: Observable<ITaxi[]>) {
+  return taxi$.pipe(
+    map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),
+    filter((taxis) => taxis.length == 0)
   );
 }
