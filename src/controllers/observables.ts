@@ -18,6 +18,7 @@ import { GeocodingResponse, TravelTimeClient } from "traveltime-api";
 import { ILocation } from "../models/ILocation";
 import { ICustomerRequest } from "../models/ICustomerRequest";
 import { ITaxi } from "../models/ITaxi";
+import { getCoordinates } from "../api/apiCalls";
 
 export function makeRequestObs(
   inputs: HTMLInputElement[],
@@ -103,20 +104,7 @@ function locationInputObs(input: HTMLInputElement): Observable<ILocation> {
 
 function getLocationCoords(location: string): Observable<ILocation> {
   return from(
-    fetch(
-      `https://api.traveltimeapp.com/v4/geocoding/search?query=${location}&limit=1&format.exclude.country=true&format.name=true&bounds=43%2C22.5%2C43.5%2C21.5&app_id=${process.env.APP_ID}&api_key=${process.env.API_KEY}`,
-      {
-        method: "GET",
-        headers: {
-          "Accept-Language": "en-US",
-        },
-      }
-    )
-      .then((res) => {
-        //console.log(res);
-        if (res.ok) return res.json();
-        else throw new Error("Lokacija je van dometa taksi servisa");
-      })
+    getCoordinates(location)
       .then((data) => {
         if (data.features.length > 0) return data;
         else throw new Error("Lokacija je van dometa taksi servisa");

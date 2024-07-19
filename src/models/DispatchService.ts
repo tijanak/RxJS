@@ -35,6 +35,9 @@ import {
   createEmptyGarageObs,
 } from "../controllers/observables";
 import { Garage } from "./Garage";
+import { ResponseRoute, RoutesResponse } from "traveltime-api";
+import { getRouteInformation } from "../api/apiCalls";
+import { differenceInMinutes } from "date-fns";
 export class DispatchService {
   private taxiRidesSubject: Subject<ITaxiRide[]> = new Subject();
   public ride$: Observable<ITaxiRide[]> = this.taxiRidesSubject.asObservable();
@@ -69,7 +72,7 @@ export class DispatchService {
         });
     });
 
-    combineLatest([request$, garage.taxi$]).subscribe(() => {
+    combineLatest([request$, garage.taxi$, this.ride$]).subscribe(() => {
       let end = new Subject();
       request$
         .pipe(skip(this.taxiRides.length), takeUntil(end), toArray())
@@ -84,10 +87,30 @@ export class DispatchService {
     this.taxiRidesSubject.next(this.taxiRides);
   }
   private addTaxiRide(taxi: ITaxi, request: ICustomerRequest): void {
-    let taxiId = this.taxiRides.length;
-    let newTaxiRide: TaxiRide = new TaxiRide(taxiId, taxi, request);
-    this.garage.changeAvailability(taxi.plate, false);
-    this.taxiRides.push(newTaxiRide);
-    this.notify();
+    let rideId = this.taxiRides.length;
+    getRouteInformation(request.origin, request.destination)
+      .then((data: RoutesResponse) => {
+        let route: ResponseRoute =
+          data.results[0].locations[0].properties[0].route;
+        let duration: number = this.getRideDurationInMin(
+          new Date(route.arrival_time),
+          new Date(route.departure_time)
+        );
+
+        let newTaxiRide: TaxiRide = new TaxiRide(
+          duration,
+          rideId,
+          taxi,
+          request
+        );
+        this.garage.changeAvailability(taxi.plate, false);
+        this.taxiRides.push(newTaxiRide);
+        this.notify();
+      })
+      .catch((err) => console.error(err));
+  }
+
+  private getRideDurationInMin(arrival_time: Date, departure_time: Date) {
+    return Math.abs(differenceInMinutes(arrival_time, departure_time));
   }
 }
