@@ -1,4 +1,5 @@
 import { ICustomerRequest } from "./ICustomerRequest";
+import { ILocation } from "./ILocation";
 import { ITaxi } from "./ITaxi";
 
 export enum RideStatus {
@@ -11,9 +12,24 @@ export interface ITaxiRide {
   duration: number;
   status: RideStatus;
   taxi: string;
-  destination: string;
+  destination: ILocation;
+  origin: ILocation;
+  customerName: string;
 }
 
-export class TaxiRide {
-  constructor(taxi: ITaxi, request: ICustomerRequest) {}
+export class TaxiRide implements ITaxiRide {
+  id: number;
+  duration: number;
+  status: RideStatus;
+  taxi: string;
+  destination: ILocation;
+  origin: ILocation;
+  customerName: string;
+  constructor(taxiId: number, taxi: ITaxi, request: ICustomerRequest) {
+    (this.id = taxiId), (this.status = RideStatus.Pending);
+    this.taxi = taxi.plate;
+    this.destination = request.destination;
+    this.origin = request.origin;
+    this.customerName = request.customerName;
+  }
 }

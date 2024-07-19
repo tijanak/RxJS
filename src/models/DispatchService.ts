@@ -1,5 +1,5 @@
 import { ITaxi } from "../models/ITaxi";
-import { ITaxiRide } from "../models/ITaxiRide";
+import { ITaxiRide, RideStatus, TaxiRide } from "../models/ITaxiRide";
 import { ICustomerRequest } from "../models/ICustomerRequest";
 import {
   buffer,
@@ -24,7 +24,7 @@ import { Garage } from "./Garage";
 export class DispatchService {
   private subject: Subject<ITaxiRide[]> = new Subject();
   public ride$: Observable<ITaxiRide[]> = this.subject.asObservable();
-  private taxiRides: Map<number, ITaxiRide>;
+  private taxiRides: ITaxiRide[] = [];
   private availableTaxi$: Observable<ITaxi[]>;
   constructor(
     private garage: Garage,
@@ -44,9 +44,20 @@ export class DispatchService {
             );
           })
         )
-        .subscribe((taxi) =>
-          console.log(getDistanceInKm(taxi.location, request.origin))
-        );
+        .subscribe((taxi) => {
+          this.addTaxiRide(taxi, request);
+          //console.log(getDistanceInKm(taxi.location, request.origin));
+        });
     });
+  }
+  private notify(): void {
+    this.subject.next(this.taxiRides);
+  }
+  private addTaxiRide(taxi: ITaxi, request: ICustomerRequest): void {
+    let taxiId = this.taxiRides.length;
+    let newTaxiRide: TaxiRide = new TaxiRide(taxiId, taxi, request);
+    this.garage.changeAvailability(taxi.plate, false);
+    this.taxiRides.push(newTaxiRide);
+    this.notify();
   }
 }

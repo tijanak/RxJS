@@ -31,6 +31,9 @@ garage.taxi$.subscribe((taxi) => {
   //console.log(taxi);
   drawTaxis(taxiDiv, taxi);
 });
+taxiService.ride$.subscribe((rides) => {
+  console.log(rides);
+});
 var b = false,
   b2 = false;
 var btn1 = document.createElement("button");
