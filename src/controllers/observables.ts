@@ -134,3 +134,10 @@ export function getTaxis() {
     })
     .catch((e) => console.error(e));
 }
+
+export function createAvailableTaxiObs(taxi$: Observable<ITaxi[]>) {
+  return taxi$.pipe(
+    map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),
+    filter((taxis) => taxis.length != 0)
+  );
+}

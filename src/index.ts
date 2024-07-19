@@ -6,7 +6,7 @@ import { makeRequestObs } from "./controllers/observables";
 import { getDistanceInKm } from "./models/ILocation";
 import { DispatchService } from "./models/DispatchService";
 import { drawTaxi, drawTaxis } from "./views/taxiUI";
-import { Garage } from "./models/ITaxi";
+import { Garage } from "./models/Garage";
 
 let locationInputs: HTMLInputElement[] = [];
 let errorTextDivs: HTMLSpanElement[] = [];
