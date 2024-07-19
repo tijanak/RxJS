@@ -84,7 +84,9 @@ function nameObs(input: HTMLInputElement): Observable<string> {
   return fromEvent(input, "input").pipe(
     debounceTime(500),
     map((ev: InputEvent) => (<HTMLInputElement>ev.target).value),
-    filter((name: string) => name.length > 2)
+    map((value: string) => {
+      if (value.length > 0) return value;
+    })
   );
 }
 function btnObs(btn: HTMLButtonElement): Observable<Event> {
@@ -134,17 +136,6 @@ function getLocationCoords(location: string): Observable<ILocation> {
         };
     })
   );
-}
-
-export function getTaxis() {
-  return fetch(`${process.env.SERVER}taxis`)
-    .then((response) => {
-      if (response.ok) return response.json();
-    })
-    .then((data) => {
-      return data;
-    })
-    .catch((e) => console.error(e));
 }
 
 export function createAvailableTaxiObs(taxi$: Observable<ITaxi[]>) {

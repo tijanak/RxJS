@@ -85,8 +85,8 @@ let ad = new Date("2024-07-17T14:58:28+02:00");
 var diff = Math.abs(ad.getTime() - d.getTime());
 var minutes = Math.floor(diff / 1000 / 60);
 var test = Math.abs(differenceInMinutes(ad, d));
-console.log(minutes);
-console.log(test);
+//console.log(minutes);
+//console.log(test);
 //https://geocode.maps.co/search?q=Kneginje Milice 15-5, Niš&api_key=6696ee4beaedc996202413lba53bfe7
 /*{
   "type": "FeatureCollection",

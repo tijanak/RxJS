@@ -1,8 +1,8 @@
 import { Observable, Subject } from "rxjs";
 import { IGeocode } from "./IGeocode";
-import { getTaxis } from "../controllers/observables";
 import { ITaxi } from "./ITaxi";
 import { ILocation } from "./ILocation";
+import { getTaxis } from "../api/apiCalls";
 export class Garage {
   private subject: Subject<ITaxi[]> = new Subject();
   public taxi$: Observable<ITaxi[]> = this.subject.asObservable();

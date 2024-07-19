@@ -1,3 +1,4 @@
+import { getRideDuration as getRouteInformation } from "../api/apiCalls";
 import { ICustomerRequest } from "./ICustomerRequest";
 import { ILocation } from "./ILocation";
 import { ITaxi } from "./ITaxi";
@@ -25,5 +26,8 @@ export class TaxiRide implements ITaxiRide {
     (this.id = taxiId), (this.status = RideStatus.Pending);
     this.taxi = taxi.plate;
     this.request = request;
+    getRouteInformation(request.origin, request.destination).then((data) => {
+      console.log(data);
+    });
   }
 }
