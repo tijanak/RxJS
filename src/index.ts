@@ -2,15 +2,18 @@ import { Observable } from "rxjs";
 import { differenceInMinutes } from "date-fns";
 import { TravelTimeClient } from "traveltime-api";
 import { createElements, drawNewRequestForm } from "./views/requestFormUI";
-import { makeRequestObs, taxiObs } from "./controllers/observables";
+import { makeRequestObs } from "./controllers/observables";
 import { getDistanceInKm } from "./models/ILocation";
 import { DispatchService } from "./models/DispatchService";
 import { drawTaxi, drawTaxis } from "./views/taxiUI";
+import { Garage } from "./models/ITaxi";
 
 let locationInputs: HTMLInputElement[] = [];
 let errorTextDivs: HTMLSpanElement[] = [];
 let nameInput: HTMLInputElement = document.createElement("input");
 let formBtn: HTMLButtonElement = document.createElement("button");
+let taxiDiv: HTMLDivElement = document.createElement("div");
+document.body.appendChild(taxiDiv);
 createElements(locationInputs, errorTextDivs);
 drawNewRequestForm(
   document.body,
@@ -19,15 +22,35 @@ drawNewRequestForm(
   nameInput,
   formBtn
 );
-let taxi$ = taxiObs();
-let taxiService: DispatchService = new DispatchService(
-  taxi$,
-  makeRequestObs(locationInputs, nameInput, formBtn)
-);
-taxi$.subscribe((taxi) => {
-  console.log(taxi);
-  drawTaxis(taxi);
+
+let garage: Garage = new Garage();
+let request$ = makeRequestObs(locationInputs, nameInput, formBtn);
+request$.subscribe(() => {});
+let taxiService: DispatchService = new DispatchService(garage, request$);
+garage.taxi$.subscribe((taxi) => {
+  //console.log(taxi);
+  drawTaxis(taxiDiv, taxi);
 });
+var b = false,
+  b2 = false;
+var btn1 = document.createElement("button");
+btn1.addEventListener("click", () => {
+  garage.changeAvailability("NIdkflsjdlf", b);
+  b = !b;
+});
+var btn2 = document.createElement("button");
+btn2.addEventListener("click", () => {
+  garage.changeAvailability("NSssdfdf", b2);
+  b2 = !b2;
+});
+btn1.textContent = "bt1";
+btn2.textContent = "bt2";
+document.body.appendChild(btn1);
+document.body.appendChild(btn2);
+/*setInterval(() => {
+  garage.changeAvailability("NSssdfdf", b);
+  b = !b;
+}, 1000);*/
 /*console.log(
   getDistanceInKm(
     { latitude: 43.315171374964976, longitude: 21.91652238674348 },

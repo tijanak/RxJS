@@ -1,9 +1,8 @@
 import { ITaxi } from "../models/ITaxi";
-export function drawTaxis(taxis: ITaxi[]) {
-  let con = document.createElement("div");
-  document.body.appendChild(con);
+export function drawTaxis(container: HTMLDivElement, taxis: ITaxi[]) {
+  container.innerHTML = "";
   taxis.forEach((taxi) => {
-    drawTaxi(con, taxi);
+    drawTaxi(container, taxi);
   });
 }
 export function drawTaxi(container: HTMLDivElement, taxi: ITaxi) {

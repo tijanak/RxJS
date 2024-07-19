@@ -4,6 +4,7 @@ import {
   filter,
   from,
   fromEvent,
+  interval,
   map,
   Observable,
   repeat,
@@ -122,12 +123,14 @@ function getLocationCoords(location: string): Observable<ILocation> {
     })
   );
 }
-export function taxiObs(): Observable<ITaxi[]> {
-  return from(
-    fetch(`${process.env.SERVER}taxis`)
-      .then((response) => {
-        if (response.ok) return response.json();
-      })
-      .catch((e) => console.error(e))
-  );
+
+export function getTaxis() {
+  return fetch(`${process.env.SERVER}taxis`)
+    .then((response) => {
+      if (response.ok) return response.json();
+    })
+    .then((data) => {
+      return data;
+    })
+    .catch((e) => console.error(e));
 }
