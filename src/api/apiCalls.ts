@@ -5,7 +5,7 @@ import {
   RoutesResponseResult,
 } from "traveltime-api";
 import { ILocation } from "../models/ILocation";
-import { ITaxi } from "../models/ITaxi";
+import { ITaxi, Taxi } from "../models/ITaxi";
 
 export function getTaxis(): Promise<ITaxi[]> {
   return fetch(`${process.env.SERVER}taxis`)

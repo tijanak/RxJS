@@ -6,7 +6,6 @@ import { makeRequestObs } from "./controllers/observables";
 import { getDistanceInKm } from "./models/ILocation";
 import { DispatchService } from "./models/DispatchService";
 import { drawTaxi, drawTaxis } from "./views/taxiUI";
-import { Garage } from "./models/Garage";
 import { drawTaxiRides } from "./views/taxiRideUI";
 
 let locationInputs: HTMLInputElement[] = [];
@@ -25,17 +24,18 @@ drawNewRequestForm(
   formBtn
 );
 
-let garage: Garage = new Garage();
 let request$ = makeRequestObs(locationInputs, nameInput, formBtn);
 request$.subscribe(() => {
   //TODO - ocisti input iz zahteva
 });
-let taxiService: DispatchService = new DispatchService(garage, request$);
-garage.taxi$.subscribe((taxis) => {
+let taxiService: DispatchService = new DispatchService(request$);
+taxiService.taxi$.subscribe((taxis) => {
+  //console.log(taxis);
   drawTaxis(taxiDiv, taxis);
 });
 document.body.appendChild(ridesDiv);
 taxiService.ride$.subscribe((rides) => {
+  console.log("new rides");
   drawTaxiRides(ridesDiv, rides);
 });
 let help = document.createElement("div");
@@ -46,18 +46,18 @@ taxiService.unprocessedRequest$.subscribe((requests) => {
     help.innerHTML += r.customerName;
   });
 });
-var btn1 = document.createElement("button");
+/*var btn1 = document.createElement("button");
 btn1.addEventListener("click", () => {
-  garage.changeAvailability("NIdkflsjdlf", true);
+  taxiService.changeAvailability("NIdkflsjdlf", true);
 });
 var btn2 = document.createElement("button");
 btn2.addEventListener("click", () => {
-  garage.changeAvailability("NSssdfdf", true);
+  taxiService.changeAvailability("NSssdfdf", true);
 });
 btn1.textContent = "bt1";
 btn2.textContent = "bt2";
 document.body.appendChild(btn1);
-document.body.appendChild(btn2);
+document.body.appendChild(btn2);*/
 /*setInterval(() => {
   garage.changeAvailability("NSssdfdf", b);
   b = !b;

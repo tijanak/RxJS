@@ -9,6 +9,8 @@ import {
   Observable,
   repeat,
   ReplaySubject,
+  scan,
+  Subject,
   switchMap,
   takeLast,
   withLatestFrom,
@@ -17,7 +19,7 @@ import { IGeocode } from "../models/IGeocode";
 import { GeocodingResponse, TravelTimeClient } from "traveltime-api";
 import { ILocation } from "../models/ILocation";
 import { ICustomerRequest } from "../models/ICustomerRequest";
-import { ITaxi } from "../models/ITaxi";
+import { ITaxi, Taxi } from "../models/ITaxi";
 import { getCoordinates } from "../api/apiCalls";
 
 export function makeRequestObs(
@@ -126,9 +128,9 @@ function getLocationCoords(location: string): Observable<ILocation> {
   );
 }
 
-export function createAvailableTaxiObs(taxi$: Observable<ITaxi[]>) {
+export function createAvailableTaxiObs(taxi$: Observable<Taxi[]>) {
   return taxi$.pipe(
-    map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),
+    map((t: Taxi[]) => t.filter((taxi) => taxi.available)),
     filter((taxis) => taxis.length != 0)
   );
 }
@@ -138,4 +140,20 @@ export function createEmptyGarageObs(taxi$: Observable<ITaxi[]>) {
     map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),
     filter((taxis) => taxis.length == 0)
   );
+}
+export function makeStreamOfStreams<T>(
+  stream: Subject<Observable<T>>
+): Observable<T[]> {
+  return stream.pipe(
+    scan((acc: Observable<T>[], stream: Observable<T>) => {
+      acc.push(stream);
+      return acc;
+    }, []),
+    switchMap((streams: Observable<T>[]) => combineLatest(streams))
+  );
+}
+export function bufferStream<T>(stream: Observable<T>) {
+  const bufferOne: ReplaySubject<T> = new ReplaySubject(1);
+  stream.subscribe((value) => bufferOne.next(value));
+  return bufferOne;
 }
