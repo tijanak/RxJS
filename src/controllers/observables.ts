@@ -13,6 +13,7 @@ import {
   Subject,
   switchMap,
   takeLast,
+  tap,
   withLatestFrom,
 } from "rxjs";
 import { IGeocode } from "../models/IGeocode";
@@ -30,19 +31,21 @@ export function makeRequestObs(
   const subject = new ReplaySubject<ICustomerRequest>();
   const originObs = locationInputObs(inputs[0]);
   originObs.subscribe((location: ILocation) => {
-    console.log("origin");
+    // console.log("origin");
   });
 
   const destObs = locationInputObs(inputs[1]);
   destObs.subscribe((location: ILocation) => {
-    console.log("dest");
+    // console.log("dest");
   });
   const name = nameObs(nameInput);
   name.subscribe((name: string) => {
-    console.log(name);
+    // console.log(name);
   });
   const test = combineLatest([originObs, destObs, name]);
-  test.subscribe((e) => console.log(e));
+  test.subscribe((e) => {
+    //  console.log(e);
+  });
   const btnClick = btnObs(formBtn)
     .pipe(
       withLatestFrom(test),
@@ -146,6 +149,9 @@ export function makeStreamOfStreams<T>(
 ): Observable<T[]> {
   return stream.pipe(
     scan((acc: Observable<T>[], stream: Observable<T>) => {
+      if (acc.find((s) => s === stream)) {
+        return acc;
+      }
       acc.push(stream);
       return acc;
     }, []),

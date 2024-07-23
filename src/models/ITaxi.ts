@@ -1,7 +1,9 @@
 import {
   BehaviorSubject,
   combineLatest,
+  first,
   Observable,
+  of,
   ReplaySubject,
   scan,
   Subject,
@@ -20,9 +22,9 @@ export interface ITaxi {
 }
 
 export class Taxi implements ITaxi {
-  private taxiRidesSubject: ReplaySubject<Observable<ITaxiRide>>;
+  private taxiRidesStreams: Subject<Observable<ITaxiRide>>;
   public ride$: Observable<ITaxiRide[]>;
-  private taxiUpdateSubject: Subject<Taxi>;
+  private taxiUpdateSubject: BehaviorSubject<Taxi>;
   public taxiUpdate$: Observable<Taxi>;
   constructor(
     public plate: string,
@@ -31,10 +33,11 @@ export class Taxi implements ITaxi {
   ) {
     this.taxiUpdateSubject = new BehaviorSubject<Taxi>(this);
     this.taxiUpdate$ = this.taxiUpdateSubject.asObservable();
-    this.taxiRidesSubject = new ReplaySubject();
-    this.ride$ = makeStreamOfStreams(this.taxiRidesSubject);
+    this.taxiRidesStreams = new Subject();
+    this.ride$ = makeStreamOfStreams(this.taxiRidesStreams);
   }
   private update() {
+    console.log("taxi update");
     this.taxiUpdateSubject.next(this);
   }
   public takeRequest(request: ICustomerRequest) {
@@ -43,6 +46,8 @@ export class Taxi implements ITaxi {
     this.available = false;
     this.update();
     taxiRide.rideUpdate$.subscribe((taxiRide) => {
+      console.log("taxi got ride update");
+      console.log(taxiRide);
       if (taxiRide.status == RideStatus.Completed) {
         this.available = true;
         this.update();
@@ -51,8 +56,9 @@ export class Taxi implements ITaxi {
   }
   private addTaxiRideStream(stream: Observable<ITaxiRide>) {
     const buffered = bufferStream(stream);
-    buffered.pipe(take(1)).subscribe(() => {
-      this.taxiRidesSubject.next(stream);
+    buffered.pipe(first()).subscribe(() => {
+      //console.log("adding ride stream");
+      this.taxiRidesStreams.next(stream);
     });
   }
 }

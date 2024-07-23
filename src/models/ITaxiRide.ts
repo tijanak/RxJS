@@ -27,7 +27,7 @@ export interface ITaxiRide {
 }
 
 export class TaxiRide implements ITaxiRide {
-  private subject: Subject<ITaxiRide>;
+  private rideUpdatesSubject: BehaviorSubject<ITaxiRide>;
   public rideUpdate$: Observable<ITaxiRide>;
   status: RideStatus;
   duration: number;
@@ -37,7 +37,7 @@ export class TaxiRide implements ITaxiRide {
     this.status = RideStatus.Pending;
 
     this.duration = 0;
-    console.log(this.duration);
+    //console.log(this.duration);
     getRouteInformation(request.origin, request.destination)
       .then((data: RoutesResponse) => {
         let route: ResponseRoute =
@@ -50,7 +50,6 @@ export class TaxiRide implements ITaxiRide {
         interval(1000)
           .pipe(take(this.lengthOfRide))
           .subscribe((d) => {
-            console.log("tik");
             this.duration = d;
             this.update();
           });
@@ -59,15 +58,16 @@ export class TaxiRide implements ITaxiRide {
           .subscribe(() => {
             this.status = RideStatus.Completed;
             this.update();
-            console.log("arrived at " + this.request.destination);
+            // console.log("arrived at " + this.request.destination);
           });
       })
       .catch((err) => console.error(err));
-    this.subject = new Subject<ITaxiRide>();
-    this.rideUpdate$ = this.subject.asObservable();
+    this.rideUpdatesSubject = new BehaviorSubject<ITaxiRide>(this);
+    this.rideUpdate$ = this.rideUpdatesSubject.asObservable();
   }
   private update() {
-    this.subject.next(this);
+    console.log("taxi ride update");
+    this.rideUpdatesSubject.next(this);
   }
   private getRideDurationInMin(arrival_time: Date, departure_time: Date) {
     return Math.abs(differenceInMinutes(arrival_time, departure_time));

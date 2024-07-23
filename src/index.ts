@@ -30,12 +30,11 @@ request$.subscribe(() => {
 });
 let taxiService: DispatchService = new DispatchService(request$);
 taxiService.taxi$.subscribe((taxis) => {
-  //console.log(taxis);
   drawTaxis(taxiDiv, taxis);
 });
 document.body.appendChild(ridesDiv);
 taxiService.ride$.subscribe((rides) => {
-  console.log("new rides");
+  console.log("index new rides");
   drawTaxiRides(ridesDiv, rides);
 });
 let help = document.createElement("div");
