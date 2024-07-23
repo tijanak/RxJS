@@ -136,7 +136,6 @@ export function createAvailableTaxiObs(taxi$: Observable<Taxi[]>) {
   return taxi$.pipe(
     map((t: Taxi[]) => t.filter((taxi) => taxi.available)),
 
-    tap((t) => console.log(t)),
     distinctUntilChanged((previous: Taxi[], current: Taxi[]) => {
       let areEqual = previous.length === current.length;
       current.forEach((taxi) => {

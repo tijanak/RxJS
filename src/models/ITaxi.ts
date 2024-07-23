@@ -35,6 +35,9 @@ export class Taxi implements ITaxi {
     this.taxiUpdate$ = this.taxiUpdateSubject.asObservable();
     this.taxiRidesStreams = new Subject();
     this.ride$ = makeStreamOfStreams(this.taxiRidesStreams);
+    this.ride$.subscribe(() => {
+      console.log(plate + " rides emitted");
+    });
   }
   private update() {
     console.log("taxi update");
@@ -47,8 +50,8 @@ export class Taxi implements ITaxi {
     this.addTaxiRideStream(taxiRide.rideUpdate$);
     let sub = taxiRide.rideUpdate$.subscribe({
       next: (taxiRide) => {
-        console.log("taxi got ride update");
-        console.log(taxiRide);
+        //console.log("taxi got ride update");
+        //console.log(taxiRide);
         if (taxiRide.status == RideStatus.Completed) {
           sub.unsubscribe();
           this.available = true;

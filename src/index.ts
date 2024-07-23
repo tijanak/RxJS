@@ -5,17 +5,16 @@ import { createElements, drawNewRequestForm } from "./views/requestFormUI";
 import { makeRequestObs } from "./controllers/observables";
 import { getDistanceInKm } from "./models/ILocation";
 import { DispatchService } from "./models/DispatchService";
-import { drawTaxi, drawTaxis } from "./views/taxiUI";
-import { drawTaxiRides } from "./views/taxiRideUI";
+import { createTaxiDiv, drawTaxi, drawTaxis } from "./views/taxiUI";
+import { createTaxiRideDiv, drawTaxiRides } from "./views/taxiRideUI";
 import { getTaxis } from "./api/apiCalls";
 
 let locationInputs: HTMLInputElement[] = [];
 let errorTextDivs: HTMLSpanElement[] = [];
 let nameInput: HTMLInputElement = document.createElement("input");
 let formBtn: HTMLButtonElement = document.createElement("button");
-let taxiDiv: HTMLDivElement = document.createElement("div");
-let ridesDiv: HTMLDivElement = document.createElement("div");
-document.body.appendChild(taxiDiv);
+let taxiDiv: HTMLDivElement = createTaxiDiv();
+let ridesDiv: HTMLDivElement = createTaxiRideDiv();
 createElements(locationInputs, errorTextDivs);
 drawNewRequestForm(
   document.body,
@@ -35,8 +34,6 @@ getTaxis().then((taxis) => {
   taxiService.taxi$.subscribe((taxis) => {
     drawTaxis(taxiDiv, taxis);
   });
-
-  document.body.appendChild(ridesDiv);
   taxiService.ride$.subscribe((rides) => {
     console.log("index new rides");
     drawTaxiRides(ridesDiv, rides);
@@ -50,7 +47,7 @@ getTaxis().then((taxis) => {
     });
   });
 });
-
+//TODO - obrisi
 /*var btn1 = document.createElement("button");
 btn1.addEventListener("click", () => {
   taxiService.changeAvailability("NIdkflsjdlf", true);

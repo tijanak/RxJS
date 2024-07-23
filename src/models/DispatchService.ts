@@ -104,15 +104,15 @@ export class DispatchService {
       console.log(r);
     });
     this.request$.subscribe((r) => {
-      console.log("dispatch service got request " + r.customerName);
+      //console.log("dispatch service got request " + r.customerName);
     });
     this.taxi$.subscribe((t) => {
-      console.log("dispatch service got taxi update");
+      //  console.log("dispatch service got taxi update");
     });
 
     this.availableTaxi$.subscribe((t) => {
-      console.log("available");
-      console.log(t);
+      // console.log("available");
+      // console.log(t);
     });
     /*combineLatest([request$, this.taxi$, this.ride$]).subscribe((v) => {
       console.log("dispatch service got combo of req, taxis, rides");
