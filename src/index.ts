@@ -7,6 +7,7 @@ import { getDistanceInKm } from "./models/ILocation";
 import { DispatchService } from "./models/DispatchService";
 import { drawTaxi, drawTaxis } from "./views/taxiUI";
 import { drawTaxiRides } from "./views/taxiRideUI";
+import { getTaxis } from "./api/apiCalls";
 
 let locationInputs: HTMLInputElement[] = [];
 let errorTextDivs: HTMLSpanElement[] = [];
@@ -28,23 +29,28 @@ let request$ = makeRequestObs(locationInputs, nameInput, formBtn);
 request$.subscribe(() => {
   //TODO - ocisti input iz zahteva
 });
-let taxiService: DispatchService = new DispatchService(request$);
-taxiService.taxi$.subscribe((taxis) => {
-  drawTaxis(taxiDiv, taxis);
-});
-document.body.appendChild(ridesDiv);
-taxiService.ride$.subscribe((rides) => {
-  console.log("index new rides");
-  drawTaxiRides(ridesDiv, rides);
-});
-let help = document.createElement("div");
-document.body.appendChild(help);
-taxiService.unprocessedRequest$.subscribe((requests) => {
-  help.innerHTML = "";
-  requests.forEach((r) => {
-    help.innerHTML += r.customerName;
+getTaxis().then((taxis) => {
+  let taxiService: DispatchService = new DispatchService(request$, taxis);
+
+  taxiService.taxi$.subscribe((taxis) => {
+    drawTaxis(taxiDiv, taxis);
+  });
+
+  document.body.appendChild(ridesDiv);
+  taxiService.ride$.subscribe((rides) => {
+    console.log("index new rides");
+    drawTaxiRides(ridesDiv, rides);
+  });
+  let help = document.createElement("div");
+  document.body.appendChild(help);
+  taxiService.unprocessedRequest$.subscribe((requests) => {
+    help.innerHTML = "";
+    requests.forEach((r) => {
+      help.innerHTML += r.customerName;
+    });
   });
 });
+
 /*var btn1 = document.createElement("button");
 btn1.addEventListener("click", () => {
   taxiService.changeAvailability("NIdkflsjdlf", true);

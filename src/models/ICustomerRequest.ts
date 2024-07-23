@@ -1,7 +1,7 @@
 import { ILocation } from "./ILocation";
 
 export interface ICustomerRequest {
-  id: string;
+  id: number;
   customerName: string;
   origin: ILocation;
   destination: ILocation;

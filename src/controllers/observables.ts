@@ -1,6 +1,7 @@
 import {
   combineLatest,
   debounceTime,
+  distinctUntilChanged,
   filter,
   from,
   fromEvent,
@@ -28,7 +29,7 @@ export function makeRequestObs(
   nameInput: HTMLInputElement,
   formBtn: HTMLButtonElement
 ): Observable<ICustomerRequest> {
-  const subject = new ReplaySubject<ICustomerRequest>();
+  const subject = new Subject<ICustomerRequest>();
   const originObs = locationInputObs(inputs[0]);
   originObs.subscribe((location: ILocation) => {
     // console.log("origin");
@@ -49,9 +50,9 @@ export function makeRequestObs(
   const btnClick = btnObs(formBtn)
     .pipe(
       withLatestFrom(test),
-      map((v): ICustomerRequest => {
+      map((v, index): ICustomerRequest => {
         return {
-          id: "",
+          id: index,
           customerName: v[1][2],
           destination: v[1][1],
           origin: v[1][0],
@@ -134,10 +135,23 @@ function getLocationCoords(location: string): Observable<ILocation> {
 export function createAvailableTaxiObs(taxi$: Observable<Taxi[]>) {
   return taxi$.pipe(
     map((t: Taxi[]) => t.filter((taxi) => taxi.available)),
-    filter((taxis) => taxis.length != 0)
+
+    tap((t) => console.log(t)),
+    distinctUntilChanged((previous: Taxi[], current: Taxi[]) => {
+      let areEqual = previous.length === current.length;
+      current.forEach((taxi) => {
+        if (previous.find((t) => t.plate == taxi.plate) == undefined)
+          areEqual = false;
+      });
+      previous.forEach((taxi) => {
+        if (current.find((t) => t.plate == taxi.plate) == undefined)
+          areEqual = false;
+      });
+      return areEqual;
+    })
   );
 }
-
+//TODO - delete
 export function createEmptyGarageObs(taxi$: Observable<ITaxi[]>) {
   return taxi$.pipe(
     map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),

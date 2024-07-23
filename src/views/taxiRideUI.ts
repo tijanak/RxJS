@@ -7,5 +7,6 @@ export function drawTaxiRides(container: HTMLDivElement, rides: ITaxiRide[]) {
   });
 }
 export function drawTaxiRide(container: HTMLDivElement, ride: ITaxiRide) {
-  container.innerText += ride.taxi + ride.duration + ride.status.toString();
+  container.innerText +=
+    ride.request.id + " " + ride.duration + ride.status.toString();
 }

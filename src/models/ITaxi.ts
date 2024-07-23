@@ -41,17 +41,25 @@ export class Taxi implements ITaxi {
     this.taxiUpdateSubject.next(this);
   }
   public takeRequest(request: ICustomerRequest) {
-    let taxiRide: TaxiRide = new TaxiRide(this.plate, request);
-    this.addTaxiRideStream(taxiRide.rideUpdate$);
     this.available = false;
     this.update();
-    taxiRide.rideUpdate$.subscribe((taxiRide) => {
-      console.log("taxi got ride update");
-      console.log(taxiRide);
-      if (taxiRide.status == RideStatus.Completed) {
-        this.available = true;
-        this.update();
-      }
+    let taxiRide: TaxiRide = new TaxiRide(this.plate, request);
+    this.addTaxiRideStream(taxiRide.rideUpdate$);
+    let sub = taxiRide.rideUpdate$.subscribe({
+      next: (taxiRide) => {
+        console.log("taxi got ride update");
+        console.log(taxiRide);
+        if (taxiRide.status == RideStatus.Completed) {
+          sub.unsubscribe();
+          this.available = true;
+          this.update();
+        }
+      },
+      error: () => {},
+      complete: () => {
+        // this.available = true;
+        // this.update();
+      },
     });
   }
   private addTaxiRideStream(stream: Observable<ITaxiRide>) {

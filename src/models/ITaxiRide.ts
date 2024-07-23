@@ -11,7 +11,6 @@ import {
   take,
   timer,
 } from "rxjs";
-import { IRideUpdate } from "./IRideUpdate";
 import { getRouteInformation } from "../api/apiCalls";
 
 export enum RideStatus {
@@ -37,6 +36,8 @@ export class TaxiRide implements ITaxiRide {
     this.status = RideStatus.Pending;
 
     this.duration = 0;
+    this.rideUpdatesSubject = new BehaviorSubject<ITaxiRide>(this);
+    this.rideUpdate$ = this.rideUpdatesSubject.asObservable();
     //console.log(this.duration);
     getRouteInformation(request.origin, request.destination)
       .then((data: RoutesResponse) => {
@@ -49,21 +50,19 @@ export class TaxiRide implements ITaxiRide {
         );
         interval(1000)
           .pipe(take(this.lengthOfRide))
-          .subscribe((d) => {
-            this.duration = d;
-            this.update();
-          });
-        timer(this.lengthOfRide * 1000, 1)
-          .pipe(take(1))
-          .subscribe(() => {
-            this.status = RideStatus.Completed;
-            this.update();
-            // console.log("arrived at " + this.request.destination);
+          .subscribe({
+            next: (d) => {
+              this.duration = d;
+              this.update();
+            },
+            error: () => {},
+            complete: () => {
+              this.status = RideStatus.Completed;
+              this.update();
+            },
           });
       })
       .catch((err) => console.error(err));
-    this.rideUpdatesSubject = new BehaviorSubject<ITaxiRide>(this);
-    this.rideUpdate$ = this.rideUpdatesSubject.asObservable();
   }
   private update() {
     console.log("taxi ride update");
