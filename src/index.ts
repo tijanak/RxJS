@@ -14,7 +14,6 @@ let errorTextDivs: HTMLSpanElement[] = [];
 let nameInput: HTMLInputElement = document.createElement("input");
 let formBtn: HTMLButtonElement = document.createElement("button");
 let taxiDiv: HTMLDivElement = createTaxiDiv();
-let ridesDiv: HTMLDivElement = createTaxiRideDiv();
 createElements(locationInputs, errorTextDivs);
 drawNewRequestForm(
   document.body,
@@ -23,6 +22,7 @@ drawNewRequestForm(
   nameInput,
   formBtn
 );
+let ridesDiv: HTMLDivElement = createTaxiRideDiv();
 
 let request$ = makeRequestObs(locationInputs, nameInput, formBtn);
 request$.subscribe(() => {
@@ -35,7 +35,7 @@ getTaxis().then((taxis) => {
     drawTaxis(taxiDiv, taxis);
   });
   taxiService.ride$.subscribe((rides) => {
-    console.log("index new rides");
+    //console.log("index new rides");
     drawTaxiRides(ridesDiv, rides);
   });
   let help = document.createElement("div");

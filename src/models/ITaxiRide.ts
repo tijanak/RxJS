@@ -65,7 +65,7 @@ export class TaxiRide implements ITaxiRide {
       .catch((err) => console.error(err));
   }
   private update() {
-    console.log("taxi ride update");
+    //console.log("taxi ride update");
     this.rideUpdatesSubject.next(this);
   }
   private getRideDurationInMin(arrival_time: Date, departure_time: Date) {

@@ -22,7 +22,7 @@ export interface ITaxi {
 }
 
 export class Taxi implements ITaxi {
-  private taxiRidesStreams: Subject<Observable<ITaxiRide>>;
+  private taxiRidesStreams: ReplaySubject<Observable<ITaxiRide>>;
   public ride$: Observable<ITaxiRide[]>;
   private taxiUpdateSubject: BehaviorSubject<Taxi>;
   public taxiUpdate$: Observable<Taxi>;
@@ -33,14 +33,14 @@ export class Taxi implements ITaxi {
   ) {
     this.taxiUpdateSubject = new BehaviorSubject<Taxi>(this);
     this.taxiUpdate$ = this.taxiUpdateSubject.asObservable();
-    this.taxiRidesStreams = new Subject();
+    this.taxiRidesStreams = new ReplaySubject();
     this.ride$ = makeStreamOfStreams(this.taxiRidesStreams);
     this.ride$.subscribe(() => {
       console.log(plate + " rides emitted");
     });
   }
   private update() {
-    console.log("taxi update");
+    //console.log("taxi update");
     this.taxiUpdateSubject.next(this);
   }
   public takeRequest(request: ICustomerRequest) {
@@ -68,7 +68,7 @@ export class Taxi implements ITaxi {
   private addTaxiRideStream(stream: Observable<ITaxiRide>) {
     const buffered = bufferStream(stream);
     buffered.pipe(first()).subscribe(() => {
-      //console.log("adding ride stream");
+      console.log("adding ride stream");
       this.taxiRidesStreams.next(stream);
     });
   }

@@ -21,7 +21,7 @@ export function drawTaxi(container: HTMLDivElement, taxi: ITaxi) {
   const taxiRideContainer = document.createElement("div");
   taxiRideContainer.classList.add("taxi");
   const plate = document.createElement("p");
-  plate.innerText = "plate: " + taxi.plate;
+  plate.innerText = "Registracija: " + taxi.plate;
   const available = document.createElement("p");
   available.innerText = taxi.available ? "Slobodan" : "Nije slobodan";
   const location = document.createElement("p");
