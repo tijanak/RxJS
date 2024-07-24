@@ -60,3 +60,20 @@
   flex-direction: row;
   flex-wrap: wrap;
 }
+.request {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid black;
+}
+.reqContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.reqDiv {
+  display: flex;
+  flex-direction: row;
+  border: 2px solid black;
+  padding: 5px;
+  gap: 5px;
+}

@@ -165,8 +165,7 @@ export function makeStreamOfStreams<T>(
       if (acc.find((s) => s === stream)) {
         return acc;
       }
-      acc.push(stream);
-      return acc;
+      return [...acc, stream];
     }, []),
     switchMap((streams: Observable<T>[]) => combineLatest(streams))
   );

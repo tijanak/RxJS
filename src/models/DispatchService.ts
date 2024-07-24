@@ -19,6 +19,7 @@ import {
   of,
   repeat,
   ReplaySubject,
+  scan,
   skip,
   skipUntil,
   Subject,
@@ -26,6 +27,7 @@ import {
   take,
   takeLast,
   takeUntil,
+  tap,
   toArray,
   windowToggle,
   withLatestFrom,
@@ -44,12 +46,10 @@ export class DispatchService {
   private taxiRidesSubject: Subject<Observable<ITaxiRide[]>>;
   public ride$: Observable<ITaxiRide[]>;
   private availableTaxi$: Observable<Taxi[]>;
-  private unprocessedRequestsSubject: Subject<ICustomerRequest[]> =
-    new Subject();
-  public unprocessedRequest$: Observable<ICustomerRequest[]> =
-    this.unprocessedRequestsSubject.asObservable();
+  public unprocessedRequest$: Observable<ICustomerRequest[]>;
   private taxiStreams: Observable<Taxi>[] = [];
   public taxi$: Observable<Taxi[]>;
+  private startRequests: Subject<ITaxiRide[]> = new ReplaySubject();
   constructor(
     private request$: Observable<ICustomerRequest>,
     initialTaxis: ITaxi[]
@@ -77,15 +77,42 @@ export class DispatchService {
 
     this.taxi$ = combineLatest(this.taxiStreams);
     this.availableTaxi$ = createAvailableTaxiObs(this.taxi$);
-    let taxisAndRequest$ = zip(
-      this.availableTaxi$.pipe(filter((taxis) => taxis.length != 0)),
-      request$
+    let allRequest$ = this.request$.pipe(
+      scan((acc: ICustomerRequest[], v: ICustomerRequest) => {
+        return [...acc, v];
+      }, [])
     );
+    allRequest$.subscribe(() => {
+      console.log("all req");
+    });
+    this.unprocessedRequest$ = combineLatest([allRequest$, this.ride$]).pipe(
+      tap((r) => console.log(r)),
+      map((v) => {
+        let unprocessed: ICustomerRequest[] = [];
+        v[0].forEach((req) => {
+          if (v[1].find((ride) => ride.request.id == req.id) == undefined) {
+            unprocessed.push(req);
+          }
+        });
+        return unprocessed;
+      }),
+
+      tap((r) => console.log(r))
+    );
+    this.unprocessedRequest$.subscribe((r) => {
+      console.log(r);
+    });
+    let taxisAndRequest$ = combineLatest([
+      this.availableTaxi$,
+      this.unprocessedRequest$,
+    ]);
     taxisAndRequest$.subscribe((taxisAndRequest) => {
-      //console.log("taxi ride combo in dispatch service");
-      //console.log(taxisAndRequest);
+      // console.log("taxi ride combo in dispatch service");
+      console.log(taxisAndRequest[0], taxisAndRequest[1]);
       let taxis = taxisAndRequest[0];
-      let request = taxisAndRequest[1];
+      let requests = taxisAndRequest[1];
+      if (taxis.length == 0 || requests.length == 0) return;
+      let request = requests[0];
       of(...taxis)
         .pipe(
           min((taxi1, taxi2) => {
@@ -101,19 +128,20 @@ export class DispatchService {
         });
     });
     this.ride$.subscribe((r) => {
-      console.log("dispatch service got ride update");
-      // console.log(r);
+      //console.log("dispatch service got ride update");
+      console.log(r);
     });
     this.request$.subscribe((r) => {
       //console.log("dispatch service got request " + r.customerName);
+      console.log("request " + r.id);
     });
     this.taxi$.subscribe((t) => {
       //  console.log("dispatch service got taxi update");
     });
 
     this.availableTaxi$.subscribe((t) => {
-      //console.log("available");
-      //console.log(t);
+      // console.log("available");
+      // console.log(t);
     });
     /*combineLatest([request$, this.taxi$, this.ride$]).subscribe((v) => {
       console.log("dispatch service got combo of req, taxis, rides");
@@ -127,11 +155,12 @@ export class DispatchService {
       end.next(1);
       end.complete();
     });*/
+    this.addTaxiRideStream(this.startRequests.asObservable());
+    this.startRequests.next(new Array<ITaxiRide>());
   }
   private addTaxiRideStream(stream: Observable<ITaxiRide[]>) {
     const buffered = bufferStream(stream);
     buffered.pipe(first()).subscribe((t) => {
-      console.log("taxi ride stream being added", t);
       this.taxiRidesSubject.next(stream);
     });
   }

@@ -8,6 +8,10 @@ import { DispatchService } from "./models/DispatchService";
 import { createTaxiDiv, drawTaxi, drawTaxis } from "./views/taxiUI";
 import { createTaxiRideDiv, drawTaxiRides } from "./views/taxiRideUI";
 import { getTaxis } from "./api/apiCalls";
+import {
+  createUnprocessedReqDiv,
+  drawRequests,
+} from "./views/unprocessedRequestsUI";
 
 let locationInputs: HTMLInputElement[] = [];
 let errorTextDivs: HTMLSpanElement[] = [];
@@ -22,6 +26,7 @@ drawNewRequestForm(
   nameInput,
   formBtn
 );
+let unprocessedRequestsDiv: HTMLDivElement = createUnprocessedReqDiv();
 let ridesDiv: HTMLDivElement = createTaxiRideDiv();
 
 let request$ = makeRequestObs(locationInputs, nameInput, formBtn);
@@ -35,16 +40,11 @@ getTaxis().then((taxis) => {
     drawTaxis(taxiDiv, taxis);
   });
   taxiService.ride$.subscribe((rides) => {
-    //console.log("index new rides");
+    console.log("index new rides");
     drawTaxiRides(ridesDiv, rides);
   });
-  let help = document.createElement("div");
-  document.body.appendChild(help);
   taxiService.unprocessedRequest$.subscribe((requests) => {
-    help.innerHTML = "";
-    requests.forEach((r) => {
-      help.innerHTML += r.customerName;
-    });
+    drawRequests(unprocessedRequestsDiv, requests);
   });
 });
 //TODO - obrisi

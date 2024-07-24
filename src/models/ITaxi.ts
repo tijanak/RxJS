@@ -36,11 +36,11 @@ export class Taxi implements ITaxi {
     this.taxiRidesStreams = new ReplaySubject();
     this.ride$ = makeStreamOfStreams(this.taxiRidesStreams);
     this.ride$.subscribe(() => {
-      console.log(plate + " rides emitted");
+      //console.log(plate + " rides emitted");
     });
   }
   private update() {
-    //console.log("taxi update");
+    //  console.log(this.plate + "update");
     this.taxiUpdateSubject.next(this);
   }
   public takeRequest(request: ICustomerRequest) {
@@ -68,7 +68,6 @@ export class Taxi implements ITaxi {
   private addTaxiRideStream(stream: Observable<ITaxiRide>) {
     const buffered = bufferStream(stream);
     buffered.pipe(first()).subscribe(() => {
-      console.log("adding ride stream");
       this.taxiRidesStreams.next(stream);
     });
   }
