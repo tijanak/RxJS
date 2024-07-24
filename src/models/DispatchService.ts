@@ -102,15 +102,14 @@ export class DispatchService {
     this.unprocessedRequest$.subscribe((r) => {
       console.log(r);
     });
-    let taxisAndRequest$ = combineLatest([
-      this.availableTaxi$,
-      this.unprocessedRequest$,
-    ]);
+    let taxisAndRequest$ = this.unprocessedRequest$.pipe(
+      withLatestFrom(this.availableTaxi$)
+    );
     taxisAndRequest$.subscribe((taxisAndRequest) => {
       // console.log("taxi ride combo in dispatch service");
       console.log(taxisAndRequest[0], taxisAndRequest[1]);
-      let taxis = taxisAndRequest[0];
-      let requests = taxisAndRequest[1];
+      let taxis = taxisAndRequest[1];
+      let requests = taxisAndRequest[0];
       if (taxis.length == 0 || requests.length == 0) return;
       let request = requests[0];
       of(...taxis)

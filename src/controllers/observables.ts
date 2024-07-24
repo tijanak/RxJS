@@ -162,9 +162,6 @@ export function makeStreamOfStreams<T>(
 ): Observable<T[]> {
   return stream.pipe(
     scan((acc: Observable<T>[], stream: Observable<T>) => {
-      if (acc.find((s) => s === stream)) {
-        return acc;
-      }
       return [...acc, stream];
     }, []),
     switchMap((streams: Observable<T>[]) => combineLatest(streams))
