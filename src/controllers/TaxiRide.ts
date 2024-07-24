@@ -43,7 +43,7 @@ export class TaxiRide implements ITaxiRide {
     this.rideUpdate$ = this.rideUpdatesSubject.asObservable();
 
     this.getToOrigin();
-    getRouteInformation(request.origin, request.destination)
+    /*getRouteInformation(request.origin, request.destination)
       .then((data: RoutesResponse) => {
         let route: ResponseRoute =
           data.results[0].locations[0].properties[0].route;
@@ -64,7 +64,7 @@ export class TaxiRide implements ITaxiRide {
             },
           });
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err));*/
   }
   private getToOrigin() {
     let distanceToOrigin = getDistanceInKm(
@@ -114,7 +114,6 @@ export class TaxiRide implements ITaxiRide {
             longitude: part.coords[0].lng,
             latitude: part.coords[0].lat,
           };
-          // console.log(part);
         },
         complete: () => {
           this.status = RideStatus.Completed;
