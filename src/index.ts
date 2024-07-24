@@ -1,17 +1,17 @@
-import { createElements, drawNewRequestForm } from "./views/requestFormUI";
-import { makeRequestObs } from "./controllers/observables";
+import { getTaxis } from "./api/apiCalls";
 import { DispatchService } from "./controllers/DispatchService";
-import {
-  drawTaxiContainer,
-  drawTaxis,
-  createTaxisContainer,
-} from "./views/taxiUI";
+import { makeRequestObs } from "./controllers/observables";
+import { createElements, drawNewRequestForm } from "./views/requestFormUI";
 import {
   createRidesContainer,
   drawTaxiRideContainer,
   drawTaxiRides,
 } from "./views/taxiRideUI";
-import { getTaxis } from "./api/apiCalls";
+import {
+  createTaxisContainer,
+  drawTaxiContainer,
+  drawTaxis,
+} from "./views/taxiUI";
 import {
   createUnprocessedReqDiv,
   drawRequests,
