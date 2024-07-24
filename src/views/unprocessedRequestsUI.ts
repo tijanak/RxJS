@@ -1,16 +1,18 @@
 import { ICustomerRequest } from "../models/ICustomerRequest";
-
+import { showLocation } from "./locationUI";
 export function createUnprocessedReqDiv(): HTMLDivElement {
+  const reqContainer = document.createElement("div");
+  reqContainer.classList.add("reqContainer");
+  return reqContainer;
+}
+export function drawUnprocessedReqDiv(reqContainer: HTMLDivElement) {
   const unprocessedReqDiv = document.createElement("div");
   unprocessedReqDiv.classList.add("reqDiv");
   const title = document.createElement("p");
   title.innerText = "Neobradjeni zahtevi";
   unprocessedReqDiv.appendChild(title);
-  const reqContainer = document.createElement("div");
-  reqContainer.classList.add("reqContainer");
   unprocessedReqDiv.appendChild(reqContainer);
   document.body.appendChild(unprocessedReqDiv);
-  return reqContainer;
 }
 export function drawRequests(
   container: HTMLDivElement,
@@ -21,11 +23,17 @@ export function drawRequests(
     drawRequest(container, req);
   });
 }
-export function drawRequest(container: HTMLDivElement, req: ICustomerRequest) {
+function drawRequest(container: HTMLDivElement, req: ICustomerRequest) {
   const reqContainer = document.createElement("div");
   reqContainer.classList.add("request");
   const id = document.createElement("p");
-  id.innerText = "id: " + req.id;
+  id.innerText =
+    "id: " +
+    req.id +
+    " Putanja: " +
+    showLocation(req.origin) +
+    "->" +
+    showLocation(req.destination);
   reqContainer.appendChild(id);
   container.appendChild(reqContainer);
 }

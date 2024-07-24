@@ -1,11 +1,6 @@
-import {
-  GeocodingResponse,
-  ResponseRoute,
-  RoutesResponse,
-  RoutesResponseResult,
-} from "traveltime-api";
+import { GeocodingResponse, RoutesResponse } from "traveltime-api";
 import { ILocation } from "../models/ILocation";
-import { ITaxi, Taxi } from "../models/ITaxi";
+import { ITaxi } from "../models/ITaxi";
 
 export function getTaxis(): Promise<ITaxi[]> {
   return fetch(`${process.env.SERVER}taxis`)

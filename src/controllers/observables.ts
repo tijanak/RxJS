@@ -5,28 +5,24 @@ import {
   filter,
   from,
   fromEvent,
-  interval,
   map,
   Observable,
-  repeat,
   ReplaySubject,
   scan,
   Subject,
   switchMap,
-  takeLast,
-  tap,
   withLatestFrom,
 } from "rxjs";
-import { IGeocode } from "../models/IGeocode";
-import { GeocodingResponse, TravelTimeClient } from "traveltime-api";
-import { ILocation } from "../models/ILocation";
-import { ICustomerRequest } from "../models/ICustomerRequest";
-import { ITaxi, Taxi } from "../models/ITaxi";
+import { GeocodingResponse } from "traveltime-api";
 import { getCoordinates } from "../api/apiCalls";
+import { ICustomerRequest } from "../models/ICustomerRequest";
+import { ILocation } from "../models/ILocation";
+import { ITaxi } from "../models/ITaxi";
+import { ITaxiRide } from "../models/ITaxiRide";
 
+//TODO - sredi
 export function makeRequestObs(
   inputs: HTMLInputElement[],
-  nameInput: HTMLInputElement,
   formBtn: HTMLButtonElement
 ): Observable<ICustomerRequest> {
   const subject = new Subject<ICustomerRequest>();
@@ -39,11 +35,7 @@ export function makeRequestObs(
   destObs.subscribe((location: ILocation) => {
     // console.log("dest");
   });
-  const name = nameObs(nameInput);
-  name.subscribe((name: string) => {
-    // console.log(name);
-  });
-  const test = combineLatest([originObs, destObs, name]);
+  const test = combineLatest([originObs, destObs]);
   test.subscribe((e) => {
     //  console.log(e);
   });
@@ -53,15 +45,12 @@ export function makeRequestObs(
       map((v, index): ICustomerRequest => {
         return {
           id: index,
-          customerName: v[1][2],
           destination: v[1][1],
           origin: v[1][0],
         };
       }),
       filter((value) => {
         return (
-          value.customerName != null &&
-          value.customerName != undefined &&
           value.destination != undefined &&
           value.destination != null &&
           value.origin != null &&
@@ -75,27 +64,6 @@ export function makeRequestObs(
   return subject.asObservable();
 }
 
-/*const travelTimeClient = new TravelTimeClient(
-  {
-    applicationId: process.env.APP_ID,
-    apiKey: process.env.API_KEY,
-  },
-  { rateLimitSettings: { enabled: true } }
-);
-
-interface LocationSearchInfo {
-  address: string;
-  geocode: GeocodingResponse;
-}*/
-function nameObs(input: HTMLInputElement): Observable<string> {
-  return fromEvent(input, "input").pipe(
-    debounceTime(500),
-    map((ev: InputEvent) => (<HTMLInputElement>ev.target).value),
-    map((value: string) => {
-      if (value.length > 0) return value;
-    })
-  );
-}
 function btnObs(btn: HTMLButtonElement): Observable<Event> {
   return fromEvent(btn, "click");
 }
@@ -121,7 +89,6 @@ function getLocationCoords(location: string): Observable<ILocation> {
       })
   ).pipe(
     map((geocodeResp: GeocodingResponse): ILocation => {
-      //console.log(geocodeResp);
       if (geocodeResp != undefined && geocodeResp != null)
         return {
           address: location,
@@ -132,11 +99,11 @@ function getLocationCoords(location: string): Observable<ILocation> {
   );
 }
 
-export function createAvailableTaxiObs(taxi$: Observable<Taxi[]>) {
+export function createAvailableTaxiObs(taxi$: Observable<ITaxi[]>) {
   return taxi$.pipe(
-    map((t: Taxi[]) => t.filter((taxi) => taxi.available)),
+    map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),
 
-    distinctUntilChanged((previous: Taxi[], current: Taxi[]) => {
+    distinctUntilChanged((previous: ITaxi[], current: ITaxi[]) => {
       let areEqual = previous.length === current.length;
       current.forEach((taxi) => {
         if (previous.find((t) => t.plate == taxi.plate) == undefined)
@@ -150,11 +117,35 @@ export function createAvailableTaxiObs(taxi$: Observable<Taxi[]>) {
     })
   );
 }
-//TODO - delete
-export function createEmptyGarageObs(taxi$: Observable<ITaxi[]>) {
-  return taxi$.pipe(
-    map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),
-    filter((taxis) => taxis.length == 0)
+export function createTaxiRideObs(
+  allTaxiRideStream$: Observable<ITaxiRide[][]>
+): Observable<ITaxiRide[]> {
+  return allTaxiRideStream$.pipe(
+    map((rides: ITaxiRide[][]) => {
+      return rides.reduce((acc, rides) => {
+        acc.push(...rides);
+        acc.sort((a, b) => b.request.id - a.request.id);
+        return acc;
+      }, []);
+    })
+  );
+}
+export function createUnprocessedRequestsObs(
+  allRequest$: Observable<ICustomerRequest[]>,
+  ride$: Observable<ITaxiRide[]>
+): Observable<ICustomerRequest[]> {
+  return combineLatest([allRequest$, ride$]).pipe(
+    map((value) => {
+      let unprocessedRequests: ICustomerRequest[] = [];
+      let requests: ICustomerRequest[] = value[0];
+      let rides: ITaxiRide[] = value[1];
+      requests.forEach((req: ICustomerRequest) => {
+        if (rides.find((ride) => ride.request.id == req.id) == undefined) {
+          unprocessedRequests.push(req);
+        }
+      });
+      return unprocessedRequests;
+    })
   );
 }
 export function makeStreamOfStreams<T>(
@@ -167,7 +158,7 @@ export function makeStreamOfStreams<T>(
     switchMap((streams: Observable<T>[]) => combineLatest(streams))
   );
 }
-export function bufferStream<T>(stream: Observable<T>) {
+export function bufferStream<T>(stream: Observable<T>): ReplaySubject<T> {
   const bufferOne: ReplaySubject<T> = new ReplaySubject(1);
   stream.subscribe((value) => bufferOne.next(value));
   return bufferOne;

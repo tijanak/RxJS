@@ -13,7 +13,6 @@ export function drawNewRequestForm(
   container: HTMLElement,
   locationInputs: HTMLInputElement[],
   errorTextDivs: HTMLSpanElement[],
-  nameInput: HTMLInputElement,
   formBtn: HTMLButtonElement
 ) {
   const formTitleParagraph = document.createElement("p");
@@ -31,8 +30,6 @@ export function drawNewRequestForm(
   inputsContainer.classList.add("requestFormInputs");
   const labelsContainer: HTMLDivElement = document.createElement("div");
   labelsContainer.classList.add("requestFormLabels");
-
-  drawInput(labelsContainer, inputsContainer, nameInput, "Ime");
 
   locationInputs.forEach((input, index) => {
     drawInput(
