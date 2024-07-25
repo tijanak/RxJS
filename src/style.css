@@ -11,10 +11,15 @@
   flex-direction: column;
   gap: 5px;
 }
-.requestFormLabels {
+.inputRow {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   gap: 5px;
+}
+.errorRow {
+  justify-content: flex-end;
+  color: red;
 }
 .requestFormInputWrapper {
   display: flex;

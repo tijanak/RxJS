@@ -31,7 +31,7 @@ drawNewRequestForm(document.body, locationInputs, errorTextDivs, formBtn);
 drawUnprocessedReqDiv(unprocessedRequestsContainer);
 drawTaxiRideContainer(ridesContainer);
 
-let request$ = makeRequestObs(locationInputs, formBtn);
+let request$ = makeRequestObs(errorTextDivs, locationInputs, formBtn);
 
 getTaxis().then((taxis) => {
   let dispatchService: DispatchService = new DispatchService(request$, taxis);

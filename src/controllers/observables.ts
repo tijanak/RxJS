@@ -27,13 +27,34 @@ import { ITaxi } from "../models/ITaxi";
 import { ITaxiRide } from "../models/ITaxiRide";
 
 export function makeRequestObs(
+  errorTexts: HTMLSpanElement[],
   inputs: HTMLInputElement[],
   formBtn: HTMLButtonElement
 ): Observable<ICustomerRequest> {
   const disableFormSubmission = () => (formBtn.disabled = true);
-  const origin$ = locationInputObs(inputs[0], disableFormSubmission);
+  const hideErrorText = (errorText: HTMLSpanElement) => {
+    errorText.hidden = true;
+  };
+  const showErrorText = (errorText: HTMLSpanElement) => {
+    errorText.hidden = false;
+  };
+  const origin$ = locationInputObs(
+    inputs[0],
+    () => {
+      disableFormSubmission();
+      hideErrorText(errorTexts[0]);
+    },
+    () => showErrorText(errorTexts[0])
+  );
 
-  const destintation$ = locationInputObs(inputs[1], disableFormSubmission);
+  const destintation$ = locationInputObs(
+    inputs[1],
+    () => {
+      disableFormSubmission();
+      hideErrorText(errorTexts[1]);
+    },
+    () => showErrorText(errorTexts[1])
+  );
   const request$ = combineLatest([origin$, destintation$]);
   const validRequest$ = request$.pipe(
     filter((value) => {
@@ -64,17 +85,18 @@ function btnObs(btn: HTMLButtonElement): Observable<Event> {
 }
 function locationInputObs(
   input: HTMLInputElement,
-  disableFormSubmission: () => void
+  resetUI: () => void,
+  onError: () => void
 ): Observable<ILocation> {
   return fromEvent(input, "input").pipe(
-    tap(() => disableFormSubmission()),
+    tap(() => resetUI()),
     debounceTime(1000),
     map((ev: InputEvent) => (<HTMLInputElement>ev.target).value),
     filter((location: string) => location.length > 3),
     switchMap((location: string) =>
       getLocationCoords(location).pipe(
         catchError((err) => {
-          console.log(err);
+          onError();
           return of(null);
         })
       )

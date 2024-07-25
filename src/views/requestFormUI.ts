@@ -28,19 +28,17 @@ export function drawNewRequestForm(
 
   const inputsContainer: HTMLDivElement = document.createElement("div");
   inputsContainer.classList.add("requestFormInputs");
-  const labelsContainer: HTMLDivElement = document.createElement("div");
-  labelsContainer.classList.add("requestFormLabels");
 
   locationInputs.forEach((input, index) => {
     drawInput(
-      labelsContainer,
       inputsContainer,
       input,
-      requestFormLabels[index]
+      requestFormLabels[index],
+      errorTextDivs[index]
     );
   });
 
-  inputsWrapper.appendChild(labelsContainer);
+  //inputsWrapper.appendChild(labelsContainer);
   inputsWrapper.appendChild(inputsContainer);
   formContainer.appendChild(inputsWrapper);
 
@@ -52,13 +50,23 @@ export function drawNewRequestForm(
 }
 
 function drawInput(
-  labelsContainer: HTMLDivElement,
   inputsContainer: HTMLDivElement,
   input: HTMLInputElement,
-  labelText: string
+  labelText: string,
+  errorDiv: HTMLSpanElement
 ) {
+  const row: HTMLDivElement = document.createElement("div");
+  row.classList.add("inputRow");
+  const errorRow: HTMLDivElement = document.createElement("div");
+  errorRow.classList.add("inputRow", "errorRow");
   const label: HTMLLabelElement = document.createElement("label");
+  errorDiv.classList.add("errorText");
   label.innerText = labelText;
-  labelsContainer.appendChild(label);
-  inputsContainer.appendChild(input);
+  row.appendChild(label);
+  row.appendChild(input);
+  errorRow.appendChild(errorDiv);
+  errorDiv.innerText = "Van dometa taksi servisa";
+  errorDiv.hidden = true;
+  inputsContainer.appendChild(row);
+  inputsContainer.appendChild(errorRow);
 }
