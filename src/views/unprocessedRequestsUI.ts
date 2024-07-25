@@ -1,7 +1,7 @@
-import { icon, LayerGroup, Map, marker } from "leaflet";
+import { icon, LayerGroup, marker } from "leaflet";
+import requestImg from "../assets/request.png";
 import { ICustomerRequest } from "../models/ICustomerRequest";
 import { showLocation } from "./locationUI";
-import requestImg from "../assets/request.png";
 let requestIcon = icon({
   iconUrl: requestImg,
   iconSize: [20, 20],

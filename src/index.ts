@@ -1,4 +1,4 @@
-import { LayerGroup, Map } from "leaflet";
+import { Map } from "leaflet";
 import { getTaxis } from "./api/apiCalls";
 import { DispatchService } from "./controllers/DispatchService";
 import { makeRequestObs } from "./controllers/observables";
@@ -15,7 +15,6 @@ import {
   createUnprocessedReqDiv,
   drawRequests,
 } from "./views/unprocessedRequestsUI";
-import { combineLatest } from "rxjs";
 
 let locationInputs: HTMLInputElement[] = [];
 let errorTextDivs: HTMLSpanElement[] = [];

@@ -1,6 +1,4 @@
 import {
-  divIcon,
-  icon,
   latLng,
   latLngBounds,
   LayerGroup,
@@ -8,21 +6,12 @@ import {
   Map,
   map,
   MapOptions,
-  marker,
   tileLayer,
 } from "leaflet";
 import { drawNewRequestForm } from "./requestFormUI";
 import { drawTaxiRideContainer } from "./taxiRideUI";
 import { drawTaxiContainer } from "./taxiUI";
-import {
-  drawRequestsOnMap,
-  drawUnprocessedReqDiv,
-} from "./unprocessedRequestsUI";
-import drivingImg from "../assets/driving.png";
-import requestImg from "../assets/request.png";
-import waitingImg from "../assets/stationary.png";
-import { ITaxi } from "../models/ITaxi";
-import { ICustomerRequest } from "../models/ICustomerRequest";
+import { drawUnprocessedReqDiv } from "./unprocessedRequestsUI";
 export function drawUI(
   taxisContainer: HTMLDivElement,
   unprocessedRequestsContainer: HTMLDivElement,

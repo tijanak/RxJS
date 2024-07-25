@@ -1,12 +1,4 @@
-import {
-  DivIcon,
-  divIcon,
-  Icon,
-  icon,
-  latLng,
-  LayerGroup,
-  marker,
-} from "leaflet";
+import { DivIcon, divIcon, Icon, icon, LayerGroup, marker } from "leaflet";
 import { ITaxi } from "../models/ITaxi";
 import { showLocation } from "./locationUI";
 
