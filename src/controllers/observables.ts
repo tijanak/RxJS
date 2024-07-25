@@ -24,7 +24,6 @@ import { ILocation } from "../models/ILocation";
 import { ITaxi } from "../models/ITaxi";
 import { ITaxiRide } from "../models/ITaxiRide";
 
-//TODO - sredi
 export function makeRequestObs(
   inputs: HTMLInputElement[],
   formBtn: HTMLButtonElement
@@ -33,21 +32,20 @@ export function makeRequestObs(
   const origin$ = locationInputObs(inputs[0], disableFormSubmission);
 
   const destintation$ = locationInputObs(inputs[1], disableFormSubmission);
-  const request = combineLatest([origin$, destintation$]);
-  request
-    .pipe(
-      filter((value) => {
-        return (
-          value[0] != undefined &&
-          value[0] != null &&
-          value[1] != null &&
-          value[1] != undefined
-        );
-      })
-    )
-    .subscribe(() => (formBtn.disabled = false));
-  const btnClick = btnObs(formBtn).pipe(
-    withLatestFrom(request),
+  const request$ = combineLatest([origin$, destintation$]);
+  const validRequest$ = request$.pipe(
+    filter((value) => {
+      return (
+        value[0] != undefined &&
+        value[0] != null &&
+        value[1] != null &&
+        value[1] != undefined
+      );
+    })
+  );
+  validRequest$.subscribe(() => (formBtn.disabled = false));
+  const submission$ = btnObs(formBtn).pipe(
+    withLatestFrom(request$),
     map((v, index): ICustomerRequest => {
       return {
         id: index,
@@ -56,7 +54,7 @@ export function makeRequestObs(
       };
     })
   );
-  return btnClick;
+  return submission$;
 }
 
 function btnObs(btn: HTMLButtonElement): Observable<Event> {
