@@ -1,21 +1,13 @@
 import { getTaxis } from "./api/apiCalls";
 import { DispatchService } from "./controllers/DispatchService";
 import { makeRequestObs } from "./controllers/observables";
-import { createElements, drawNewRequestForm } from "./views/requestFormUI";
-import {
-  createRidesContainer,
-  drawTaxiRideContainer,
-  drawTaxiRides,
-} from "./views/taxiRideUI";
-import {
-  createTaxisContainer,
-  drawTaxiContainer,
-  drawTaxis,
-} from "./views/taxiUI";
+import { drawUI } from "./views/dispatchServiceUI";
+import { createElements } from "./views/requestFormUI";
+import { createRidesContainer, drawTaxiRides } from "./views/taxiRideUI";
+import { createTaxisContainer, drawTaxis } from "./views/taxiUI";
 import {
   createUnprocessedReqDiv,
   drawRequests,
-  drawUnprocessedReqDiv,
 } from "./views/unprocessedRequestsUI";
 
 let locationInputs: HTMLInputElement[] = [];
@@ -26,10 +18,14 @@ let unprocessedRequestsContainer: HTMLDivElement = createUnprocessedReqDiv();
 let ridesContainer: HTMLDivElement = createRidesContainer();
 createElements(locationInputs, errorTextDivs);
 
-drawTaxiContainer(taxisContainer);
-drawNewRequestForm(document.body, locationInputs, errorTextDivs, formBtn);
-drawUnprocessedReqDiv(unprocessedRequestsContainer);
-drawTaxiRideContainer(ridesContainer);
+drawUI(
+  taxisContainer,
+  unprocessedRequestsContainer,
+  ridesContainer,
+  locationInputs,
+  errorTextDivs,
+  formBtn
+);
 
 let request$ = makeRequestObs(errorTextDivs, locationInputs, formBtn);
 

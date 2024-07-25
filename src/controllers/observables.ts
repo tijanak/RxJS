@@ -3,7 +3,6 @@ import {
   combineLatest,
   debounceTime,
   distinctUntilChanged,
-  EMPTY,
   filter,
   from,
   fromEvent,
@@ -16,7 +15,6 @@ import {
   Subject,
   switchMap,
   tap,
-  throwError,
   withLatestFrom,
 } from "rxjs";
 import { GeocodingResponse } from "traveltime-api";

@@ -5,15 +5,18 @@ export function createUnprocessedReqDiv(): HTMLDivElement {
   reqContainer.classList.add("reqContainer");
   return reqContainer;
 }
-export function drawUnprocessedReqDiv(reqContainer: HTMLDivElement) {
+export function drawUnprocessedReqDiv(
+  container: HTMLElement,
+  reqContainer: HTMLDivElement
+) {
   const unprocessedReqDiv = document.createElement("div");
   unprocessedReqDiv.classList.add("reqDiv");
   const title = document.createElement("p");
   title.classList.add("title");
-  title.innerText = "Neobradjeni zahtevi";
+  title.innerText = "Neobradjeni zahtevi:";
   unprocessedReqDiv.appendChild(title);
   unprocessedReqDiv.appendChild(reqContainer);
-  document.body.appendChild(unprocessedReqDiv);
+  container.appendChild(unprocessedReqDiv);
 }
 export function drawRequests(
   container: HTMLDivElement,

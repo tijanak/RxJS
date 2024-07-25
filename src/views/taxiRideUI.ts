@@ -6,7 +6,10 @@ export function createRidesContainer(): HTMLDivElement {
   ridesContainer.classList.add("ridesContainer");
   return ridesContainer;
 }
-export function drawTaxiRideContainer(ridesContainer: HTMLDivElement) {
+export function drawTaxiRideContainer(
+  container: HTMLElement,
+  ridesContainer: HTMLDivElement
+) {
   const taxiRideDiv = document.createElement("div");
   taxiRideDiv.classList.add("taxiRideDiv");
   const title = document.createElement("p");
@@ -14,7 +17,7 @@ export function drawTaxiRideContainer(ridesContainer: HTMLDivElement) {
   title.innerText = "Istorija vožnji";
   taxiRideDiv.appendChild(title);
   taxiRideDiv.appendChild(ridesContainer);
-  document.body.appendChild(taxiRideDiv);
+  container.appendChild(taxiRideDiv);
 }
 export function drawTaxiRides(
   container: HTMLDivElement,

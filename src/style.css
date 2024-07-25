@@ -11,6 +11,10 @@
   flex-direction: column;
   gap: 5px;
 }
+.row {
+  display: flex;
+  flex-direction: row;
+}
 .inputRow {
   display: flex;
   flex-direction: row;
@@ -81,4 +85,7 @@
   border: 2px solid black;
   padding: 5px;
   gap: 5px;
+}
+#map {
+  height: 400px;
 }

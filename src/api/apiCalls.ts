@@ -15,7 +15,7 @@ export function getTaxis(): Promise<ITaxi[]> {
 }
 export function getCoordinates(location: string): Promise<GeocodingResponse> {
   return fetch(
-    `https://api.traveltimeapp.com/v4/geocoding/search?query=${location}&limit=1&format.exclude.country=true&format.name=true&bounds=43%2C22.5%2C43.5%2C21.5&app_id=${process.env.APP_ID}&api_key=${process.env.API_KEY}`,
+    `https://api.traveltimeapp.com/v4/geocoding/search?query=${location}&limit=1&format.exclude.country=true&format.name=true&bounds=${process.env.SE_BOUND_LAT}%2C${process.env.SE_BOUND_LONG}%2C${process.env.NW_BOUND_LAT}%2C${process.env.NW_BOUND_LONG}&app_id=${process.env.APP_ID}&api_key=${process.env.API_KEY}`,
     {
       method: "GET",
       headers: {

@@ -5,7 +5,10 @@ export function createTaxisContainer(): HTMLDivElement {
   taxisContainer.classList.add("taxisContainer");
   return taxisContainer;
 }
-export function drawTaxiContainer(taxisContainer: HTMLDivElement) {
+export function drawTaxiContainer(
+  container: HTMLElement,
+  taxisContainer: HTMLDivElement
+) {
   const taxiDiv = document.createElement("div");
   taxiDiv.classList.add("taxiDiv");
   const title = document.createElement("p");
@@ -13,7 +16,7 @@ export function drawTaxiContainer(taxisContainer: HTMLDivElement) {
   title.innerText = "Taksi vozila";
   taxiDiv.appendChild(title);
   taxiDiv.appendChild(taxisContainer);
-  document.body.appendChild(taxiDiv);
+  container.appendChild(taxiDiv);
 }
 export function drawTaxis(container: HTMLDivElement, taxis: ITaxi[]) {
   container.innerHTML = "";
