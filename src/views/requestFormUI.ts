@@ -17,7 +17,7 @@ export function drawNewRequestForm(
 ) {
   const formTitleParagraph = document.createElement("p");
   formTitleParagraph.innerText = "Novi zahtev";
-  formTitleParagraph.classList.add("formTitle");
+  formTitleParagraph.classList.add("title");
 
   const formContainer: HTMLDivElement = document.createElement("div");
   formContainer.classList.add("requestForm");

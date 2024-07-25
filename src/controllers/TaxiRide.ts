@@ -1,16 +1,15 @@
 import { differenceInMinutes } from "date-fns";
-import { ITaxiRide, RideStatus } from "../models/ITaxiRide";
 import {
   BehaviorSubject,
-  Observable,
-  take,
-  interval,
-  timer,
-  from,
   combineLatest,
   concatMap,
-  of,
   delay,
+  from,
+  interval,
+  Observable,
+  of,
+  take,
+  timer,
 } from "rxjs";
 import {
   ResponseRoute,
@@ -20,6 +19,7 @@ import {
 import { getRouteInformation } from "../api/apiCalls";
 import { ICustomerRequest } from "../models/ICustomerRequest";
 import { getDistanceInKm, ILocation } from "../models/ILocation";
+import { ITaxiRide, RideStatus } from "../models/ITaxiRide";
 
 export class TaxiRide implements ITaxiRide {
   private rideUpdatesSubject: BehaviorSubject<ITaxiRide>;
@@ -30,6 +30,7 @@ export class TaxiRide implements ITaxiRide {
 
   private lengthOfRide: number;
   private avgSpeedKMH: number = 40;
+  private minInMilisseconds = 1000;
 
   constructor(
     public currentLocation: ILocation,
@@ -50,7 +51,7 @@ export class TaxiRide implements ITaxiRide {
       this.request.origin
     );
     let minToGetToOrigin = (distanceToOrigin / this.avgSpeedKMH) * 60;
-    let driveToOrigin = timer(1000 * minToGetToOrigin);
+    let driveToOrigin = timer(this.minInMilisseconds * minToGetToOrigin);
     let getRouteInfo = from(
       getRouteInformation(this.request.origin, this.request.destination)
     );
@@ -73,7 +74,7 @@ export class TaxiRide implements ITaxiRide {
     this.status = RideStatus.OnRoute;
     this.currentLocation = this.request.origin;
     this.update();
-    let drivingTimer = interval(1000).subscribe(() => {
+    let drivingTimer = interval(this.minInMilisseconds).subscribe(() => {
       this.duration += 1;
 
       this.update();
@@ -81,7 +82,7 @@ export class TaxiRide implements ITaxiRide {
     from(parts)
       .pipe(
         concatMap((part: ResponseRoutePart) =>
-          of(part).pipe(delay((part.travel_time / 60) * 1000))
+          of(part).pipe(delay((part.travel_time / 60) * this.minInMilisseconds))
         )
       )
       .subscribe({

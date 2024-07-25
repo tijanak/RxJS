@@ -1,9 +1,7 @@
 import {
-  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
-  exhaustMap,
   filter,
   from,
   fromEvent,

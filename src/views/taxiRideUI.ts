@@ -10,6 +10,7 @@ export function drawTaxiRideContainer(ridesContainer: HTMLDivElement) {
   const taxiRideDiv = document.createElement("div");
   taxiRideDiv.classList.add("taxiRideDiv");
   const title = document.createElement("p");
+  title.classList.add("title");
   title.innerText = "Istorija vožnji";
   taxiRideDiv.appendChild(title);
   taxiRideDiv.appendChild(ridesContainer);

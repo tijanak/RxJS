@@ -32,9 +32,7 @@ drawUnprocessedReqDiv(unprocessedRequestsContainer);
 drawTaxiRideContainer(ridesContainer);
 
 let request$ = makeRequestObs(locationInputs, formBtn);
-request$.subscribe(() => {
-  //TODO - ocisti input iz zahteva
-});
+
 getTaxis().then((taxis) => {
   let dispatchService: DispatchService = new DispatchService(request$, taxis);
 

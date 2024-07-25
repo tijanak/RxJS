@@ -9,6 +9,7 @@ export function drawUnprocessedReqDiv(reqContainer: HTMLDivElement) {
   const unprocessedReqDiv = document.createElement("div");
   unprocessedReqDiv.classList.add("reqDiv");
   const title = document.createElement("p");
+  title.classList.add("title");
   title.innerText = "Neobradjeni zahtevi";
   unprocessedReqDiv.appendChild(title);
   unprocessedReqDiv.appendChild(reqContainer);

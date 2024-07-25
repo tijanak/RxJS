@@ -24,4 +24,9 @@ module.exports = {
   plugins: [
     new Dotenv({ path: path.resolve(__dirname, "./env/environment.env") }),
   ],
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
+  },
 };

@@ -1,9 +1,9 @@
 import { BehaviorSubject, first, Observable, ReplaySubject } from "rxjs";
-import { bufferStream, makeStreamOfStreams } from "./observables";
-import { ITaxiRide, RideStatus } from "../models/ITaxiRide";
+import { ICustomerRequest } from "../models/ICustomerRequest";
 import { ILocation } from "../models/ILocation";
 import { ITaxi } from "../models/ITaxi";
-import { ICustomerRequest } from "../models/ICustomerRequest";
+import { ITaxiRide, RideStatus } from "../models/ITaxiRide";
+import { bufferStream, makeStreamOfStreams } from "./observables";
 import { TaxiRide } from "./TaxiRide";
 
 export class Taxi implements ITaxi {

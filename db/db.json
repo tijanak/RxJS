@@ -2,14 +2,18 @@
   "taxis": [
     {
       "plate": "NI 036-TX",
-      "location": { "latitude": "43.317105", "longitude": "21.903770" }
+      "location": {
+        "address": "Učiteljski dom",
+        "latitude": "43.321440",
+        "longitude": "21.901122"
+      }
     },
     {
       "plate": "NI 174-TX",
       "location": {
-        "address": "sup",
-        "latitude": "43.330411",
-        "longitude": "21.892567"
+        "address": "Nikola Pašića",
+        "latitude": "43.318482",
+        "longitude": "21.893992"
       }
     }
   ]
