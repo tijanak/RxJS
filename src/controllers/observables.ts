@@ -37,7 +37,6 @@ export function makeRequestObs(
   const request$ = combineLatest([origin$, destintation$]);
   const validRequest$ = request$.pipe(
     filter((value) => {
-      console.log(value);
       return (
         value[0] != undefined &&
         value[0] != null &&
@@ -76,7 +75,7 @@ function locationInputObs(
       getLocationCoords(location).pipe(
         catchError((err) => {
           console.log(err);
-          return EMPTY;
+          return of(null);
         })
       )
     ),
