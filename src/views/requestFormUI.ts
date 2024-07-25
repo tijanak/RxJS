@@ -44,6 +44,7 @@ export function drawNewRequestForm(
   inputsWrapper.appendChild(inputsContainer);
   formContainer.appendChild(inputsWrapper);
 
+  formBtn.disabled = true;
   formBtn.textContent = "Dodaj zahtev";
   formContainer.appendChild(formBtn);
 

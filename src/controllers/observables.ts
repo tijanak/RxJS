@@ -1,7 +1,9 @@
 import {
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  exhaustMap,
   filter,
   from,
   fromEvent,
@@ -9,8 +11,10 @@ import {
   Observable,
   ReplaySubject,
   scan,
+  share,
   Subject,
   switchMap,
+  tap,
   withLatestFrom,
 } from "rxjs";
 import { GeocodingResponse } from "traveltime-api";
@@ -25,83 +29,72 @@ export function makeRequestObs(
   inputs: HTMLInputElement[],
   formBtn: HTMLButtonElement
 ): Observable<ICustomerRequest> {
-  const subject = new Subject<ICustomerRequest>();
-  const originObs = locationInputObs(inputs[0]);
-  originObs.subscribe((location: ILocation) => {
-    // console.log("origin");
-  });
+  const disableFormSubmission = () => (formBtn.disabled = true);
+  const origin$ = locationInputObs(inputs[0], disableFormSubmission);
 
-  const destObs = locationInputObs(inputs[1]);
-  destObs.subscribe((location: ILocation) => {
-    // console.log("dest");
-  });
-  const test = combineLatest([originObs, destObs]);
-  test.subscribe((e) => {
-    //  console.log(e);
-  });
-  const btnClick = btnObs(formBtn)
+  const destintation$ = locationInputObs(inputs[1], disableFormSubmission);
+  const request = combineLatest([origin$, destintation$]);
+  request
     .pipe(
-      withLatestFrom(test),
-      map((v, index): ICustomerRequest => {
-        return {
-          id: index,
-          destination: v[1][1],
-          origin: v[1][0],
-        };
-      }),
       filter((value) => {
         return (
-          value.destination != undefined &&
-          value.destination != null &&
-          value.origin != null &&
-          value.origin != undefined
+          value[0] != undefined &&
+          value[0] != null &&
+          value[1] != null &&
+          value[1] != undefined
         );
       })
     )
-    .subscribe((e) => {
-      subject.next(e);
-    });
-  return subject.asObservable();
+    .subscribe(() => (formBtn.disabled = false));
+  const btnClick = btnObs(formBtn).pipe(
+    withLatestFrom(request),
+    map((v, index): ICustomerRequest => {
+      return {
+        id: index,
+        destination: v[1][1],
+        origin: v[1][0],
+      };
+    })
+  );
+  return btnClick;
 }
 
 function btnObs(btn: HTMLButtonElement): Observable<Event> {
   return fromEvent(btn, "click");
 }
-function locationInputObs(input: HTMLInputElement): Observable<ILocation> {
+function locationInputObs(
+  input: HTMLInputElement,
+  disableFormSubmission: () => void
+): Observable<ILocation> {
   return fromEvent(input, "input").pipe(
+    tap(() => disableFormSubmission()),
     debounceTime(1000),
     map((ev: InputEvent) => (<HTMLInputElement>ev.target).value),
     filter((location: string) => location.length > 3),
-    switchMap((location: string) => getLocationCoords(location))
+    switchMap((location: string) => getLocationCoords(location)),
+    share()
   );
 }
 
 function getLocationCoords(location: string): Observable<ILocation> {
-  return from(
-    getCoordinates(location)
-      .then((data) => {
-        if (data.features.length > 0) return data;
-        else throw new Error("Lokacija je van dometa taksi servisa");
-      })
-      .catch((e) => {
-        console.error(e);
-        alert(e);
-      })
-  ).pipe(
+  return from(getCoordinates(location)).pipe(
     map((geocodeResp: GeocodingResponse): ILocation => {
-      if (geocodeResp != undefined && geocodeResp != null)
+      if (geocodeResp && geocodeResp.features.length > 0) {
         return {
           address: location,
           latitude: geocodeResp.features[0].geometry.coordinates[1],
           longitude: geocodeResp.features[0].geometry.coordinates[0],
         };
+      } else {
+        alert("Lokacija je van dometa taksi servisa");
+      }
     })
   );
 }
 
 export function createAvailableTaxiObs(taxi$: Observable<ITaxi[]>) {
   return taxi$.pipe(
-    map((t: ITaxi[]) => t.filter((taxi) => taxi.available)),
+    map((taxis: ITaxi[]) => taxis.filter((taxi) => taxi.available)),
 
     distinctUntilChanged((previous: ITaxi[], current: ITaxi[]) => {
       let areEqual = previous.length === current.length;
