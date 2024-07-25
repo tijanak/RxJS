@@ -1,18 +1,22 @@
 import {
+  catchError,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
+  EMPTY,
   filter,
   from,
   fromEvent,
   map,
   Observable,
+  of,
   ReplaySubject,
   scan,
   share,
   Subject,
   switchMap,
   tap,
+  throwError,
   withLatestFrom,
 } from "rxjs";
 import { GeocodingResponse } from "traveltime-api";
@@ -33,6 +37,7 @@ export function makeRequestObs(
   const request$ = combineLatest([origin$, destintation$]);
   const validRequest$ = request$.pipe(
     filter((value) => {
+      console.log(value);
       return (
         value[0] != undefined &&
         value[0] != null &&
@@ -67,7 +72,14 @@ function locationInputObs(
     debounceTime(1000),
     map((ev: InputEvent) => (<HTMLInputElement>ev.target).value),
     filter((location: string) => location.length > 3),
-    switchMap((location: string) => getLocationCoords(location)),
+    switchMap((location: string) =>
+      getLocationCoords(location).pipe(
+        catchError((err) => {
+          console.log(err);
+          return EMPTY;
+        })
+      )
+    ),
     share()
   );
 }
@@ -82,7 +94,7 @@ function getLocationCoords(location: string): Observable<ILocation> {
           longitude: geocodeResp.features[0].geometry.coordinates[0],
         };
       } else {
-        alert("Lokacija je van dometa taksi servisa");
+        throw new Error("Lokacija je van dometa taksi servisa");
       }
     })
   );
