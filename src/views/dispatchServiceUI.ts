@@ -1,7 +1,11 @@
 import {
+  divIcon,
   icon,
   latLng,
   latLngBounds,
+  LayerGroup,
+  layerGroup,
+  Map,
   map,
   MapOptions,
   marker,
@@ -10,15 +14,23 @@ import {
 import { drawNewRequestForm } from "./requestFormUI";
 import { drawTaxiRideContainer } from "./taxiRideUI";
 import { drawTaxiContainer } from "./taxiUI";
-import { drawUnprocessedReqDiv } from "./unprocessedRequestsUI";
-import drving from "../assets/driving.png";
+import {
+  drawRequestsOnMap,
+  drawUnprocessedReqDiv,
+} from "./unprocessedRequestsUI";
+import drivingImg from "../assets/driving.png";
+import requestImg from "../assets/request.png";
+import waitingImg from "../assets/stationary.png";
+import { ITaxi } from "../models/ITaxi";
+import { ICustomerRequest } from "../models/ICustomerRequest";
 export function drawUI(
   taxisContainer: HTMLDivElement,
   unprocessedRequestsContainer: HTMLDivElement,
   ridesContainer: HTMLDivElement,
   locationInputs: HTMLInputElement[],
   errorTextDivs: HTMLSpanElement[],
-  formBtn: HTMLButtonElement
+  formBtn: HTMLButtonElement,
+  mapContainer: HTMLDivElement
 ) {
   drawTaxiContainer(document.body, taxisContainer);
   const row = document.createElement("div");
@@ -28,13 +40,26 @@ export function drawUI(
   document.body.appendChild(row);
   row.classList.add("row");
   drawTaxiRideContainer(document.body, ridesContainer);
+  document.body.appendChild(mapContainer);
+}
+export function createMapDiv(): HTMLDivElement {
   const mapDiv = document.createElement("div");
   mapDiv.id = "map";
-  document.body.appendChild(mapDiv);
-  var center = latLng(43.320752, 21.897498);
+  return mapDiv;
+}
+export function createMap(mapDiv: HTMLDivElement): Map {
+  let centerLat: number =
+    (parseFloat(process.env.SE_BOUND_LAT) +
+      parseFloat(process.env.NW_BOUND_LAT)) /
+    2;
+  let centerLong =
+    (parseFloat(process.env.NW_BOUND_LONG) +
+      parseFloat(process.env.SE_BOUND_LONG)) /
+    2;
+  var centerPoint = latLng(centerLat, centerLong);
   const options: MapOptions = {
-    center: center,
-    zoom: 13,
+    center: centerPoint,
+    zoom: 12,
     maxBounds: latLngBounds([
       [
         parseFloat(process.env.SE_BOUND_LAT),
@@ -52,12 +77,9 @@ export function drawUI(
   tileLayer
     .wms("http://ows.mundialis.de/services/service?", { layers: "OSM-WMS" })
     .addTo(mymap);
-  let taxiIcon = icon({
-    iconUrl: drving,
-    iconSize: [50, 64],
-  });
-  marker([43.32144, 21.901122], { icon: taxiIcon }).addTo(mymap);
-  const img = document.createElement("img");
-  img.src = drving;
-  document.body.appendChild(img);
+  return mymap;
+}
+export function createDrawingLayer(map: Map): LayerGroup {
+  let layer: LayerGroup = layerGroup().addTo(map);
+  return layer;
 }

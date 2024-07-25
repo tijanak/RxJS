@@ -1,5 +1,11 @@
+import { icon, LayerGroup, Map, marker } from "leaflet";
 import { ICustomerRequest } from "../models/ICustomerRequest";
 import { showLocation } from "./locationUI";
+import requestImg from "../assets/request.png";
+let requestIcon = icon({
+  iconUrl: requestImg,
+  iconSize: [20, 20],
+});
 export function createUnprocessedReqDiv(): HTMLDivElement {
   const reqContainer = document.createElement("div");
   reqContainer.classList.add("reqContainer");
@@ -19,13 +25,19 @@ export function drawUnprocessedReqDiv(
   container.appendChild(unprocessedReqDiv);
 }
 export function drawRequests(
+  mapLayer: LayerGroup,
   container: HTMLDivElement,
   requests: ICustomerRequest[]
 ) {
   container.innerHTML = "";
+  mapLayer.clearLayers();
   requests.forEach((req) => {
     drawRequest(container, req);
+    drawRequestOnMap(mapLayer, req);
   });
+}
+export function drawRequestsOnMap(requests: ICustomerRequest[]) {
+  requests.forEach((req) => {});
 }
 function drawRequest(container: HTMLDivElement, req: ICustomerRequest) {
   const reqContainer = document.createElement("div");
@@ -40,4 +52,9 @@ function drawRequest(container: HTMLDivElement, req: ICustomerRequest) {
     showLocation(req.destination);
   reqContainer.appendChild(id);
   container.appendChild(reqContainer);
+}
+function drawRequestOnMap(mapLayer: LayerGroup, req: ICustomerRequest) {
+  marker([req.origin.latitude, req.origin.longitude], {
+    icon: requestIcon,
+  }).addTo(mapLayer);
 }

@@ -1,5 +1,32 @@
+import {
+  DivIcon,
+  divIcon,
+  Icon,
+  icon,
+  latLng,
+  LayerGroup,
+  marker,
+} from "leaflet";
 import { ITaxi } from "../models/ITaxi";
 import { showLocation } from "./locationUI";
+
+import drivingImg from "../assets/driving.png";
+import requestImg from "../assets/request.png";
+import waitingImg from "../assets/stationary.png";
+
+const drivingIcon: Icon = icon({
+  iconUrl: drivingImg,
+  iconSize: [20, 20],
+});
+const waitingIcon: Icon = icon({
+  iconUrl: waitingImg,
+  iconSize: [20, 20],
+});
+const requestIcon: Icon = icon({
+  iconUrl: requestImg,
+  iconSize: [20, 20],
+});
+
 export function createTaxisContainer(): HTMLDivElement {
   const taxisContainer = document.createElement("div");
   taxisContainer.classList.add("taxisContainer");
@@ -18,10 +45,16 @@ export function drawTaxiContainer(
   taxiDiv.appendChild(taxisContainer);
   container.appendChild(taxiDiv);
 }
-export function drawTaxis(container: HTMLDivElement, taxis: ITaxi[]) {
+export function drawTaxis(
+  mapLayer: LayerGroup,
+  container: HTMLDivElement,
+  taxis: ITaxi[]
+) {
   container.innerHTML = "";
+  mapLayer.clearLayers();
   taxis.forEach((taxi) => {
     drawTaxi(container, taxi);
+    drawTaxiOnMap(mapLayer, taxi);
   });
 }
 function drawTaxi(container: HTMLDivElement, taxi: ITaxi) {
@@ -37,4 +70,21 @@ function drawTaxi(container: HTMLDivElement, taxi: ITaxi) {
   taxiRideContainer.appendChild(available);
   taxiRideContainer.appendChild(location);
   container.appendChild(taxiRideContainer);
+}
+function drawTaxiOnMap(mapLayer: LayerGroup, taxi: ITaxi) {
+  let plateText: HTMLParagraphElement = document.createElement("p");
+  plateText.innerText = taxi.plate;
+  let textIcon: DivIcon = divIcon({ html: plateText, className: "map-text" });
+  let taxiIcon: Icon;
+  if (taxi.available) {
+    taxiIcon = waitingIcon;
+  } else {
+    taxiIcon = drivingIcon;
+  }
+  marker([taxi.location.latitude, taxi.location.longitude], {
+    icon: textIcon,
+  }).addTo(mapLayer);
+  marker([taxi.location.latitude, taxi.location.longitude], {
+    icon: taxiIcon,
+  }).addTo(mapLayer);
 }

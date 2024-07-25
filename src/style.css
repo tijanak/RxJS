@@ -46,6 +46,9 @@
   flex-direction: row;
   flex-wrap: wrap;
 }
+.map-text {
+  align-content: center;
+}
 .taxiDiv {
   display: flex;
   flex-direction: column;
