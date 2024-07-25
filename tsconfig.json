@@ -8,5 +8,6 @@
     "allowJs": true,
     "sourceMap": true,
     "moduleResolution": "node"
-  }
+  },
+  "include": ["src", "images.ts"]
 }

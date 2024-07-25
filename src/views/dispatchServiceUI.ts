@@ -1,8 +1,17 @@
-import { latLng, latLngBounds, map, MapOptions, tileLayer } from "leaflet";
+import {
+  icon,
+  latLng,
+  latLngBounds,
+  map,
+  MapOptions,
+  marker,
+  tileLayer,
+} from "leaflet";
 import { drawNewRequestForm } from "./requestFormUI";
 import { drawTaxiRideContainer } from "./taxiRideUI";
 import { drawTaxiContainer } from "./taxiUI";
 import { drawUnprocessedReqDiv } from "./unprocessedRequestsUI";
+import drving from "../assets/driving.png";
 export function drawUI(
   taxisContainer: HTMLDivElement,
   unprocessedRequestsContainer: HTMLDivElement,
@@ -22,7 +31,6 @@ export function drawUI(
   const mapDiv = document.createElement("div");
   mapDiv.id = "map";
   document.body.appendChild(mapDiv);
-  console.log(process.env.SE_BOUND_LAT);
   var center = latLng(43.320752, 21.897498);
   const options: MapOptions = {
     center: center,
@@ -44,4 +52,12 @@ export function drawUI(
   tileLayer
     .wms("http://ows.mundialis.de/services/service?", { layers: "OSM-WMS" })
     .addTo(mymap);
+  let taxiIcon = icon({
+    iconUrl: drving,
+    iconSize: [50, 64],
+  });
+  marker([43.32144, 21.901122], { icon: taxiIcon }).addTo(mymap);
+  const img = document.createElement("img");
+  img.src = drving;
+  document.body.appendChild(img);
 }
