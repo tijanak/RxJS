@@ -64,10 +64,15 @@ export class TaxiRide implements ITaxiRide {
   private driveRoute(parts: ResponseRoutePart[]): Observable<Coords> {
     let drive = from(parts).pipe(
       concatMap((part: ResponseRoutePart) =>
-        of(part).pipe(
-          concatMap((part) =>
-            of(...part.coords).pipe(
-              delay((part.travel_time / 60) * this.minInMilisseconds)
+        from(part.coords).pipe(
+          concatMap((coord, index) =>
+            of(coord).pipe(
+              delay(
+                index == 0
+                  ? 0
+                  : (part.travel_time / 60 / part.coords.length) *
+                      this.minInMilisseconds
+              )
             )
           )
         )
