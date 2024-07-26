@@ -66,7 +66,11 @@ function drawTaxi(container: HTMLDivElement, taxi: ITaxi) {
 function drawTaxiOnMap(mapLayer: LayerGroup, taxi: ITaxi) {
   let plateText: HTMLParagraphElement = document.createElement("p");
   plateText.innerText = taxi.plate;
-  let textIcon: DivIcon = divIcon({ html: plateText, className: "map-text" });
+  plateText.classList.add("map-text");
+  let textIcon: DivIcon = divIcon({
+    html: plateText,
+    className: "map-text-container",
+  });
   let taxiIcon: Icon;
   if (taxi.available) {
     taxiIcon = waitingIcon;
