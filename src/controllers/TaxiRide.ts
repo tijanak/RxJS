@@ -1,24 +1,20 @@
 import { differenceInMinutes } from "date-fns";
 import {
   BehaviorSubject,
-  combineLatest,
   concatMap,
   delay,
   from,
   interval,
   Observable,
   of,
+  share,
   take,
-  timer,
 } from "rxjs";
-import {
-  ResponseRoute,
-  ResponseRoutePart,
-  RoutesResponse,
-} from "traveltime-api";
-import { getRouteInformation } from "../api/apiCalls";
+import { ResponseRoutePart } from "traveltime-api";
+import { getRouteInfo } from "../api/apiCalls";
 import { ICustomerRequest } from "../models/ICustomerRequest";
-import { getDistanceInKm, ILocation } from "../models/ILocation";
+import { IDriveRoute } from "../models/IDriveRoute";
+import { ILocation } from "../models/ILocation";
 import { ITaxiRide, RideStatus } from "../models/ITaxiRide";
 
 export class TaxiRide implements ITaxiRide {
@@ -31,6 +27,7 @@ export class TaxiRide implements ITaxiRide {
   private lengthOfRide: number;
   private avgSpeedKMH: number = 40;
   private minInMilisseconds = 1000;
+  private route: IDriveRoute;
 
   constructor(
     public currentLocation: ILocation,
@@ -43,34 +40,48 @@ export class TaxiRide implements ITaxiRide {
     this.rideUpdatesSubject = new BehaviorSubject<ITaxiRide>(this);
     this.rideUpdate$ = this.rideUpdatesSubject.asObservable();
 
-    this.getToOrigin();
+    this.startDrive();
   }
-  private getToOrigin() {
-    let distanceToOrigin = getDistanceInKm(
-      this.currentLocation,
-      this.request.origin
+  private startDrive() {
+    let routeInfoFetch = from(
+      getRouteInfo(
+        this.currentLocation,
+        this.request.origin,
+        this.request.destination
+      )
     );
-    let minToGetToOrigin = (distanceToOrigin / this.avgSpeedKMH) * 60;
-    let driveToOrigin = timer(this.minInMilisseconds * minToGetToOrigin);
-    let getRouteInfo = from(
-      getRouteInformation(this.request.origin, this.request.destination)
-    );
-    let arriveAtOrigin = combineLatest([driveToOrigin, getRouteInfo]).pipe(
-      take(1)
-    );
-    arriveAtOrigin.subscribe((startInfo) => {
-      let routeInfo: RoutesResponse = startInfo[1];
-      let route: ResponseRoute =
-        routeInfo.results[0].locations[0].properties[0].route;
-      this.lengthOfRide = this.getRideDurationInMin(
-        new Date(route.arrival_time),
-        new Date(route.departure_time)
-      );
-      let parts: ResponseRoutePart[] = route.parts;
-      this.driveFromOriginToDestination(parts);
+    routeInfoFetch.pipe(take(1)).subscribe((routeInfo: IDriveRoute) => {
+      this.route = routeInfo;
+      console.log(routeInfo);
+      this.driveToOrigin().subscribe({
+        complete: () => {
+          this.driveFromOriginToDestination();
+        },
+      });
     });
   }
-  private driveFromOriginToDestination(parts: ResponseRoutePart[]): void {
+  private driveRoute(
+    parts: ResponseRoutePart[]
+  ): Observable<ResponseRoutePart> {
+    let drive = from(parts).pipe(
+      concatMap((part: ResponseRoutePart) =>
+        of(part).pipe(delay((part.travel_time / 60) * this.minInMilisseconds))
+      ),
+      share()
+    );
+    drive.subscribe((part) => {
+      this.currentLocation = {
+        longitude: part.coords[0].lng,
+        latitude: part.coords[0].lat,
+      };
+      this.update();
+    });
+    return drive;
+  }
+  private driveToOrigin(): Observable<ResponseRoutePart> {
+    return this.driveRoute(this.route.toOrigin.parts);
+  }
+  private driveFromOriginToDestination(): void {
     this.status = RideStatus.OnRoute;
     this.currentLocation = this.request.origin;
     this.update();
@@ -79,26 +90,15 @@ export class TaxiRide implements ITaxiRide {
 
       this.update();
     });
-    from(parts)
-      .pipe(
-        concatMap((part: ResponseRoutePart) =>
-          of(part).pipe(delay((part.travel_time / 60) * this.minInMilisseconds))
-        )
-      )
-      .subscribe({
-        next: (part) => {
-          this.currentLocation = {
-            longitude: part.coords[0].lng,
-            latitude: part.coords[0].lat,
-          };
-        },
-        complete: () => {
-          this.status = RideStatus.Completed;
-          this.currentLocation = this.request.destination;
-          drivingTimer.unsubscribe();
-          this.update();
-        },
-      });
+    let ride = this.driveRoute(this.route.toDestination.parts);
+    ride.subscribe({
+      complete: () => {
+        this.status = RideStatus.Completed;
+        this.currentLocation = this.request.destination;
+        drivingTimer.unsubscribe();
+        this.update();
+      },
+    });
   }
   private update() {
     this.rideUpdatesSubject.next(this);

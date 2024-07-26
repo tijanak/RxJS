@@ -1,4 +1,9 @@
-import { GeocodingResponse, RoutesResponse } from "traveltime-api";
+import {
+  GeocodingResponse,
+  ResponseRoute,
+  RoutesResponse,
+} from "traveltime-api";
+import { IDriveRoute } from "../models/IDriveRoute";
 import { ILocation } from "../models/ILocation";
 import { ITaxi } from "../models/ITaxi";
 
@@ -27,27 +32,83 @@ export function getCoordinates(location: string): Promise<GeocodingResponse> {
     else throw new Error("Lokacija je van dometa taksi servisa");
   });
 }
-export function getRouteInformation(
+
+export function getRouteInfo(
+  currentLocation: ILocation,
   origin: ILocation,
   destination: ILocation
-): Promise<RoutesResponse> {
-  return fetch(
-    `https://api.traveltimeapp.com/v4/routes?type=driving&origin_lat=${
-      origin.latitude
-    }&origin_lng=${origin.longitude}&destination_lat=${
-      destination.latitude
-    }&destination_lng=${
-      destination.longitude
-    }&departure_time=${new Date().toISOString()}&app_id=${
-      process.env.APP_ID
-    }&api_key=${process.env.API_KEY}`
-  )
-    .then((response) => {
-      if (response.ok) return response.json();
-      else throw new Error("connection issue");
+): Promise<IDriveRoute> {
+  const toOriginKey = "toOrigin";
+  const routeKey = "route";
+  const taxiLocationId = "taxiLocation";
+  const originLocationId = "origin";
+  const destinationLocationId = "destination";
+  const params = {
+    locations: [
+      {
+        id: taxiLocationId,
+        coords: {
+          lat: currentLocation.latitude,
+          lng: currentLocation.longitude,
+        },
+      },
+      {
+        id: originLocationId,
+        coords: {
+          lat: origin.latitude,
+          lng: origin.longitude,
+        },
+      },
+      {
+        id: destinationLocationId,
+        coords: {
+          lat: destination.latitude,
+          lng: destination.longitude,
+        },
+      },
+    ],
+    departure_searches: [
+      {
+        id: toOriginKey,
+        departure_location_id: taxiLocationId,
+        arrival_location_ids: [originLocationId],
+        departure_time: new Date().toISOString(),
+        properties: ["route"],
+        transportation: {
+          type: "driving",
+        },
+      },
+      {
+        id: routeKey,
+        departure_location_id: originLocationId,
+        arrival_location_ids: [destinationLocationId],
+        departure_time: new Date().toISOString(),
+        properties: ["route"],
+        transportation: {
+          type: "driving",
+        },
+      },
+    ],
+  };
+  return fetch("https://api.traveltimeapp.com/v4/routes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Application-Id": process.env.APP_ID,
+      "X-Api-Key": process.env.API_KEY,
+    },
+    body: JSON.stringify(params),
+  })
+    .then((respone) => {
+      if (respone.ok) return respone.json();
     })
-    .then((data) => {
-      return data;
-    })
-    .catch((err) => console.error(err));
+    .then((data: RoutesResponse) => {
+      let toOrigin = data.results.find((v) => v.search_id == toOriginKey);
+      let toDestination = data.results.find((v) => v.search_id == routeKey);
+      let toOriginRoute: ResponseRoute =
+        toOrigin.locations[0].properties[0].route;
+      let toDestinationRoute: ResponseRoute =
+        toDestination.locations[0].properties[0].route;
+      return { toOrigin: toOriginRoute, toDestination: toDestinationRoute };
+    });
 }

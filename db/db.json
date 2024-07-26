@@ -4,16 +4,16 @@
       "plate": "NI 036-TX",
       "location": {
         "address": "Učiteljski dom",
-        "latitude": "43.321440",
-        "longitude": "21.901122"
+        "latitude": 43.32144,
+        "longitude": 21.901122
       }
     },
     {
       "plate": "NI 174-TX",
       "location": {
         "address": "Nikola Pašića",
-        "latitude": "43.318482",
-        "longitude": "21.893992"
+        "latitude": 43.318482,
+        "longitude": 21.893992
       }
     }
   ]

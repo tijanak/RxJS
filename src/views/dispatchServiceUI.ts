@@ -21,15 +21,19 @@ export function drawUI(
   formBtn: HTMLButtonElement,
   mapContainer: HTMLDivElement
 ) {
-  drawTaxiContainer(document.body, taxisContainer);
-  const row = document.createElement("div");
+  const row1 = document.createElement("div");
+  row1.classList.add("row");
+  drawNewRequestForm(row1, locationInputs, errorTextDivs, formBtn);
+  drawUnprocessedReqDiv(row1, unprocessedRequestsContainer);
 
-  drawNewRequestForm(row, locationInputs, errorTextDivs, formBtn);
-  drawUnprocessedReqDiv(row, unprocessedRequestsContainer);
-  document.body.appendChild(row);
-  row.classList.add("row");
+  const row2 = document.createElement("div");
+  row2.classList.add("row");
+  drawTaxiContainer(row2, taxisContainer);
+  row2.appendChild(mapContainer);
+
+  document.body.appendChild(row1);
+  document.body.appendChild(row2);
   drawTaxiRideContainer(document.body, ridesContainer);
-  document.body.appendChild(mapContainer);
 }
 export function createMapDiv(): HTMLDivElement {
   const mapDiv = document.createElement("div");

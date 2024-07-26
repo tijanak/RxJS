@@ -1,5 +1,5 @@
 import { Map } from "leaflet";
-import { getTaxis } from "./api/apiCalls";
+import { getRouteInfo, getTaxis } from "./api/apiCalls";
 import { DispatchService } from "./controllers/DispatchService";
 import { makeRequestObs } from "./controllers/observables";
 import {
