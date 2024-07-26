@@ -7,6 +7,7 @@ import {
   interval,
   Observable,
   of,
+  pairwise,
   share,
   take,
 } from "rxjs";
@@ -14,7 +15,7 @@ import { Coords, ResponseRoutePart } from "traveltime-api";
 import { getRouteInfo } from "../api/apiCalls";
 import { ICustomerRequest } from "../models/ICustomerRequest";
 import { IDriveRoute } from "../models/IDriveRoute";
-import { ILocation } from "../models/ILocation";
+import { getDistanceInKm, ILocation } from "../models/ILocation";
 import { ITaxiRide, RideStatus } from "../models/ITaxiRide";
 
 export class TaxiRide implements ITaxiRide {
@@ -50,6 +51,7 @@ export class TaxiRide implements ITaxiRide {
     );
     routeInfoFetch.pipe(take(1)).subscribe((routeInfo: IDriveRoute) => {
       this.route = routeInfo;
+      console.log(routeInfo);
       this.driveToOrigin().subscribe({
         complete: () => {
           this.driveFromOriginToDestination();
@@ -57,18 +59,20 @@ export class TaxiRide implements ITaxiRide {
       });
     });
   }
-  private driveRoute(parts: ResponseRoutePart[]): Observable<Coords> {
+  private driveRoute(parts: ResponseRoutePart[]): Observable<any> {
     let drive = from(parts).pipe(
       filter((part) => part.mode == "car"),
       concatMap((part: ResponseRoutePart) =>
         from(part.coords).pipe(
-          concatMap((coord, index) =>
-            of(coord).pipe(
+          pairwise(),
+          concatMap((coords: [Coords, Coords], index) =>
+            of(coords).pipe(
               delay(
-                index == 0
-                  ? 0
-                  : (part.travel_time / 60 / part.coords.length) *
-                      this.minInMilisseconds
+                this.getSectionTravelTimeInMin(
+                  coords,
+                  part.distance,
+                  part.travel_time
+                ) * this.minInMilisseconds
               )
             )
           )
@@ -78,8 +82,8 @@ export class TaxiRide implements ITaxiRide {
     );
     drive.subscribe((coords) => {
       this.currentLocation = {
-        longitude: coords.lng,
-        latitude: coords.lat,
+        longitude: coords[1].lng,
+        latitude: coords[1].lat,
       };
       this.update();
     });
@@ -108,5 +112,19 @@ export class TaxiRide implements ITaxiRide {
   }
   private update() {
     this.rideUpdatesSubject.next(this);
+  }
+  private getSectionTravelTimeInMin(
+    section: [Coords, Coords],
+    partDistance: number,
+    partTravelTime: number
+  ): number {
+    let distanceInMeters =
+      getDistanceInKm(
+        { latitude: section[0].lat, longitude: section[0].lng },
+        { latitude: section[1].lat, longitude: section[1].lng }
+      ) * 1000;
+    let travelTimeInSec: number =
+      (distanceInMeters * partTravelTime) / partDistance;
+    return travelTimeInSec / 60;
   }
 }
