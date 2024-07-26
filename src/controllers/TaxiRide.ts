@@ -2,6 +2,7 @@ import {
   BehaviorSubject,
   concatMap,
   delay,
+  filter,
   from,
   interval,
   Observable,
@@ -59,6 +60,7 @@ export class TaxiRide implements ITaxiRide {
   }
   private driveRoute(parts: ResponseRoutePart[]): Observable<Coords> {
     let drive = from(parts).pipe(
+      filter((part) => part.mode == "car"),
       concatMap((part: ResponseRoutePart) =>
         from(part.coords).pipe(
           concatMap((coord, index) =>
@@ -100,7 +102,6 @@ export class TaxiRide implements ITaxiRide {
     ride.subscribe({
       complete: () => {
         this.status = RideStatus.Completed;
-        this.currentLocation = this.request.destination;
         drivingTimer.unsubscribe();
         this.update();
       },
