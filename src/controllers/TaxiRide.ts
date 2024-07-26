@@ -1,4 +1,3 @@
-import { differenceInMinutes } from "date-fns";
 import {
   BehaviorSubject,
   concatMap,
@@ -9,7 +8,6 @@ import {
   of,
   share,
   take,
-  tap,
 } from "rxjs";
 import { Coords, ResponseRoutePart } from "traveltime-api";
 import { getRouteInfo } from "../api/apiCalls";
@@ -25,8 +23,6 @@ export class TaxiRide implements ITaxiRide {
   public status: RideStatus;
   public duration: number;
 
-  private lengthOfRide: number;
-  private avgSpeedKMH: number = 40;
   private minInMilisseconds = 1000;
   private route: IDriveRoute;
 
