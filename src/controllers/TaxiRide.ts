@@ -50,7 +50,6 @@ export class TaxiRide implements ITaxiRide {
     );
     routeInfoFetch.pipe(take(1)).subscribe((routeInfo: IDriveRoute) => {
       this.route = routeInfo;
-      console.log(routeInfo);
       this.driveToOrigin().subscribe({
         complete: () => {
           this.driveFromOriginToDestination();
