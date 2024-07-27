@@ -40,16 +40,24 @@ let taxisDrawingLayer = createDrawingLayer(map);
 
 let request$ = makeRequestObs(errorTextDivs, locationInputs, formBtn);
 
-getTaxis().then((taxis) => {
-  let dispatchService: DispatchService = new DispatchService(request$, taxis);
+getTaxis()
+  .then((taxis) => {
+    let dispatchService: DispatchService = new DispatchService(request$, taxis);
 
-  dispatchService.taxi$.subscribe((taxis) => {
-    drawTaxis(taxisDrawingLayer, taxisContainer, taxis);
+    dispatchService.taxi$.subscribe((taxis) => {
+      drawTaxis(taxisDrawingLayer, taxisContainer, taxis);
+    });
+    dispatchService.ride$.subscribe((rides) => {
+      drawTaxiRides(ridesContainer, rides);
+    });
+    dispatchService.unprocessedRequest$.subscribe((requests) => {
+      drawRequests(
+        requestsDrawingLayer,
+        unprocessedRequestsContainer,
+        requests
+      );
+    });
+  })
+  .catch((err) => {
+    alert(err);
   });
-  dispatchService.ride$.subscribe((rides) => {
-    drawTaxiRides(ridesContainer, rides);
-  });
-  dispatchService.unprocessedRequest$.subscribe((requests) => {
-    drawRequests(requestsDrawingLayer, unprocessedRequestsContainer, requests);
-  });
-});

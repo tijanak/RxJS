@@ -12,12 +12,11 @@ export function getTaxis(): Promise<ITaxi[]> {
   return fetch(`${process.env.SERVER}taxis`)
     .then((response) => {
       if (response.ok) return response.json();
-      else throw new Error("connection issue");
+      else throw new Error("Taksiji su nedostupni");
     })
     .then((data) => {
       return data;
-    })
-    .catch((err) => console.error(err));
+    });
 }
 export function getCoordinates(location: string): Promise<GeocodingResponse> {
   return fetch(
