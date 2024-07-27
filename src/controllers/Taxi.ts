@@ -42,6 +42,7 @@ export class Taxi implements ITaxi {
       this.location = taxiRide.currentLocation;
       if (taxiRide.status == RideStatus.Completed) {
         sub.unsubscribe();
+        this.location.address = taxiRide.request.destination.address;
         this.available = true;
       }
 

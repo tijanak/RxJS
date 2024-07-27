@@ -7,6 +7,7 @@ import { IDriveRoute } from "../models/IDriveRoute";
 import { ILocation } from "../models/ILocation";
 import { ITaxi } from "../models/ITaxi";
 
+//TODO - add error handling on api calls
 export function getTaxis(): Promise<ITaxi[]> {
   return fetch(`${process.env.SERVER}taxis`)
     .then((response) => {
@@ -32,7 +33,6 @@ export function getCoordinates(location: string): Promise<GeocodingResponse> {
     else throw new Error("Lokacija je van dometa taksi servisa");
   });
 }
-
 export function getRouteInfo(
   currentLocation: ILocation,
   origin: ILocation,

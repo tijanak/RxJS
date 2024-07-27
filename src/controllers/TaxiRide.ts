@@ -76,8 +76,7 @@ export class TaxiRide implements ITaxiRide {
             )
           )
         )
-      ),
-      share()
+      )
     );
     drive.subscribe((coords) => {
       this.currentLocation = {
