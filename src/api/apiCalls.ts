@@ -7,7 +7,6 @@ import { IDriveRoute } from "../models/IDriveRoute";
 import { ILocation } from "../models/ILocation";
 import { ITaxi } from "../models/ITaxi";
 
-//TODO - add error handling on api calls
 export function getTaxis(): Promise<ITaxi[]> {
   return fetch(`${process.env.SERVER}taxis`)
     .then((response) => {
@@ -100,10 +99,16 @@ export function getRouteInfo(
   })
     .then((respone) => {
       if (respone.ok) return respone.json();
+      else throw new Error("Cant get route");
     })
     .then((data: RoutesResponse) => {
       let toOrigin = data.results.find((v) => v.search_id == toOriginKey);
       let toDestination = data.results.find((v) => v.search_id == routeKey);
+      if (
+        toDestination.unreachable.length > 0 ||
+        toOrigin.unreachable.length > 0
+      )
+        throw new Error("Cant get route");
       let toOriginRoute: ResponseRoute =
         toOrigin.locations[0].properties[0].route;
       let toDestinationRoute: ResponseRoute =

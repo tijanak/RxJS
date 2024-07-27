@@ -49,13 +49,20 @@ export class TaxiRide implements ITaxiRide {
         this.request.destination
       )
     );
-    routeInfoFetch.pipe(take(1)).subscribe((routeInfo: IDriveRoute) => {
-      this.route = routeInfo;
-      this.driveToOrigin().subscribe({
-        complete: () => {
-          this.driveFromOriginToDestination();
-        },
-      });
+    routeInfoFetch.pipe(take(1)).subscribe({
+      next: (routeInfo: IDriveRoute) => {
+        this.route = routeInfo;
+        this.driveToOrigin().subscribe({
+          complete: () => {
+            this.driveFromOriginToDestination();
+          },
+        });
+      },
+      error: (err) => {
+        console.error(err);
+        this.status = RideStatus.Canceled;
+        this.update();
+      },
     });
   }
   private driveRoute(parts: ResponseRoutePart[]): Observable<any> {

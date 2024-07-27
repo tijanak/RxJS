@@ -40,7 +40,10 @@ export class Taxi implements ITaxi {
   private drive(taxiRide: TaxiRide) {
     let sub = taxiRide.rideUpdate$.subscribe((taxiRide) => {
       this.location = taxiRide.currentLocation;
-      if (taxiRide.status == RideStatus.Completed) {
+      if (
+        taxiRide.status == RideStatus.Completed ||
+        taxiRide.status == RideStatus.Canceled
+      ) {
         sub.unsubscribe();
         this.location.address = taxiRide.request.destination.address;
         this.available = true;

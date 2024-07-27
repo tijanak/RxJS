@@ -2,6 +2,7 @@ import { ICustomerRequest } from "./ICustomerRequest";
 import { ILocation } from "./ILocation";
 
 export enum RideStatus {
+  Canceled = "Vožnja otkazana",
   Pending = "Taksi na putu do klijenta",
   OnRoute = "Na putu ka destinaciji",
   Completed = "Voznja zavrsena",
