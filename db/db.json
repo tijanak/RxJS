@@ -15,6 +15,14 @@
         "latitude": 43.318482,
         "longitude": 21.893992
       }
+    },
+    {
+      "plate": "NI 871-TX",
+      "location": {
+        "address": "Glavna autobuska stanica",
+        "latitude": 43.324399,
+        "longitude": 21.890767
+      }
     }
   ]
 }
